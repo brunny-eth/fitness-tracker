@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="settings-container">
+
+<h2>Goals</h2>
+
+<div class="goal-indicator-banner">
+    Currently in {% if weight_direction == 'loss' %}loss weight{% else %}weight gain{% endif %} mode
+  </div>
 
 <div class="section">
-    <h2>Goals</h2>
     <div class="settings-form">
         <div class="form-section">
             <div class="section-header">
@@ -44,8 +48,9 @@
         </div>
     </div>
     
+    <h2>Nutrition Settings</h2>
+
     <div class="section">
-        <h2>Nutrition Settings</h2>
         <div class="settings-form">
             <div class="form-section">
                 <h3>Protein Intake Goal</h3>
@@ -476,12 +481,31 @@
     padding: 20px;
 }
 
+.goal-indicator-banner {
+ text-align: center;
+ padding: 8px;
+ background-color: #f3f4f6;
+ border-radius: 6px;
+ color: #4b5563;
+ font-size: 14px;
+ font-weight: 500;
+ margin: 8px 0 24px 0;
+}
+
+h2 {
+ font-size: 24px;
+ font-weight: 600;
+ margin: 0 0 24px 0;
+ color: #111827;
+}
+
 .section {
-    background: white;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    padding: 24px;
-    border: 1px solid #e5e7eb;
+ background: white;
+ border-radius: 8px;
+ margin-bottom: 24px;
+ padding: 32px;
+ border: 1px solid #e5e7eb;
+ box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .section h2 {

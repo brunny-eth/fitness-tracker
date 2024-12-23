@@ -830,8 +830,14 @@ def settings():
         days_remaining = (goal_date - datetime.utcnow()).days
         months_remaining = round(days_remaining / 30.44, 1)
     
+    weight_direction = determine_weight_direction(
+    latest_weight.weight if latest_weight else settings.current_weight_kg,
+    settings.target_weight_kg
+    )
+
     return render_template('settings.html',
                          active_tab='settings',
+                         weight_direction=weight_direction,
                          settings=settings,
                          latest_weight=latest_weight,
                          current_weight_kg=latest_weight.weight if latest_weight else settings.current_weight_kg,
