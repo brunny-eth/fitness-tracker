@@ -133,11 +133,12 @@ def calculate_protein_goal(weight_kg, ratio, direction='loss'):
     For weight gain: use current weight + 10% for muscle growth support
     """
     if direction == 'gain':
-        weight_for_calculation = weight_kg * 1.1  
+        weight_for_calculation = weight_kg * 1.1
     else:
         weight_for_calculation = weight_kg
         
     return round(weight_for_calculation * ratio)
+
 
 def calculate_calorie_target(current_weight_kg, settings):
     """Calculate daily calorie target based on current weight and goals"""
@@ -562,132 +563,127 @@ def saved_meals():
 @app.route('/history')
 @login_required
 def history():
-    end_date = date.today()
-    start_date = end_date - timedelta(days=29)
-    
-    settings = UserSettings.query.filter_by(user_id=current_user.id).first()
-    if not settings:
-        flash('Please configure your settings first')
-        return redirect(url_for('settings'))
-    
-    # Get latest weight for direction calculation
-    latest_weight_entry = WeightEntry.query.filter_by(
-        user_id=current_user.id
-    ).order_by(WeightEntry.date.desc()).first()
-    
-    current_weight_kg = latest_weight_entry.weight if latest_weight_entry else settings.current_weight_kg
-    weight_direction = determine_weight_direction(current_weight_kg, settings.target_weight_kg)
-    
-    # Calculate protein goal with direction
-    protein_goal = calculate_protein_goal(
-        settings.target_weight_kg, 
-        settings.protein_ratio,
-        direction=weight_direction
-    )
-    
-    weight_entries = WeightEntry.query.filter(
-        WeightEntry.user_id == current_user.id,
-        WeightEntry.date >= start_date,
-        WeightEntry.date <= end_date
-    ).all()
-    
-    nutrition_entries = NutritionEntry.query.filter(
-        NutritionEntry.user_id == current_user.id,
-        NutritionEntry.date >= start_date,
-        NutritionEntry.date <= end_date
-    ).all()
-    
-    workouts = Workout.query.filter(
-        Workout.user_id == current_user.id,
-        Workout.date >= datetime.combine(start_date, datetime.min.time()),
-        Workout.date <= datetime.combine(end_date, datetime.max.time())
-    ).all()
-    
-    nutrition_by_date = {}
-    for entry in nutrition_entries:
-        if entry.date not in nutrition_by_date:
-            nutrition_by_date[entry.date] = {'protein': 0, 'calories': 0}
-        nutrition_by_date[entry.date]['protein'] += entry.protein_amount
-        nutrition_by_date[entry.date]['calories'] += entry.calorie_amount
-    
-    weight_by_date = {entry.date: entry.weight for entry in weight_entries}
-    
-    chart_data = []
-    current_date = start_date
-    while current_date <= end_date:
-        nutrition = nutrition_by_date.get(current_date, {'protein': None, 'calories': None})
-        chart_data.append({
-            'date': current_date.strftime('%Y-%m-%d'),
-            'protein': nutrition['protein'],
-            'calories': nutrition['calories'],
-            'weight': weight_by_date.get(current_date)
-        })
-        current_date += timedelta(days=1)
-    
-    history = []
-    current_date = end_date
-    while current_date >= start_date:
-        nutrition = nutrition_by_date.get(current_date)
-        day_workout = next((w for w in workouts if w.date.date() == current_date), None)
-        
-        if nutrition:
-            calories_status = (
-                'under_goal' if weight_direction == 'gain' and nutrition['calories'] < settings.max_calories else
-                'over_goal' if weight_direction == 'loss' and nutrition['calories'] > settings.max_calories else
-                'on_target'
-            )
-        else:
-            calories_status = None
-            
-        history.append({
-            'date': current_date,
-            'nutrition': {
-                'protein': nutrition['protein'] if nutrition else 0,
-                'calories': nutrition['calories'] if nutrition else 0,
-                'protein_goal': protein_goal,
-                'calories_status': calories_status
-            },  
-            'workout': {
-                'type': day_workout.type,
-                'exercises': json.loads(day_workout.exercises)
-            } if day_workout else None
-        })
-        current_date -= timedelta(days=1)
-    
-    # Calculate progress differently based on direction
-    progress = None
-    total_change = None
-    current_change = None
-    if latest_weight_entry and settings.target_weight_kg and settings.starting_weight_kg:
-        latest_kg = latest_weight_entry.weight
-        target_kg = settings.target_weight_kg
-        starting_kg = settings.starting_weight_kg
-        
-        # Calculate changes based on direction
-        if weight_direction == 'loss':
-            total_change = starting_kg - target_kg  # Positive number for weight loss goal
-            current_change = starting_kg - latest_kg  # Positive number means weight lost
-        else:  # gain or maintain
-            total_change = target_kg - starting_kg  # Positive number for weight gain goal
-            current_change = latest_kg - starting_kg  # Positive number means weight gained
-            
-        if total_change != 0:
-            progress = round((current_change / total_change) * 100, 1)
-            # Cap progress at 100% if goal is exceeded
-            progress = min(progress, 100) if progress > 0 else max(progress, -100)
-    
-    return render_template('history.html',
-                         active_tab='history',
-                         history=history,
-                         chart_data=chart_data,
-                         protein_goal=protein_goal,
-                         settings=settings,
-                         max_calories=settings.max_calories,
-                         latest_weight_entry=latest_weight_entry,
-                         progress=progress,
-                         total_change=total_change,
-                         current_change=current_change,
-                         weight_direction=weight_direction)
+   end_date = date.today()
+   start_date = max(end_date - timedelta(days=29), current_user.created_at.date())
+   
+   settings = UserSettings.query.filter_by(user_id=current_user.id).first()
+   if not settings:
+       flash('Please configure your settings first')
+       return redirect(url_for('settings'))
+   
+   latest_weight_entry = WeightEntry.query.filter_by(
+       user_id=current_user.id
+   ).order_by(WeightEntry.date.desc()).first()
+   
+   current_weight_kg = latest_weight_entry.weight if latest_weight_entry else settings.current_weight_kg
+   weight_direction = determine_weight_direction(current_weight_kg, settings.target_weight_kg)
+   
+   protein_goal = calculate_protein_goal(
+       settings.target_weight_kg, 
+       settings.protein_ratio,
+       direction=weight_direction
+   )
+   
+   weight_entries = WeightEntry.query.filter(
+       WeightEntry.user_id == current_user.id,
+       WeightEntry.date >= start_date,
+       WeightEntry.date <= end_date
+   ).all()
+   
+   nutrition_entries = NutritionEntry.query.filter(
+       NutritionEntry.user_id == current_user.id,
+       NutritionEntry.date >= start_date,
+       NutritionEntry.date <= end_date
+   ).all()
+   
+   workouts = Workout.query.filter(
+       Workout.user_id == current_user.id,
+       Workout.date >= datetime.combine(start_date, datetime.min.time()),
+       Workout.date <= datetime.combine(end_date, datetime.max.time())
+   ).all()
+   
+   nutrition_by_date = {}
+   for entry in nutrition_entries:
+       if entry.date not in nutrition_by_date:
+           nutrition_by_date[entry.date] = {'protein': 0, 'calories': 0}
+       nutrition_by_date[entry.date]['protein'] += entry.protein_amount
+       nutrition_by_date[entry.date]['calories'] += entry.calorie_amount
+   
+   weight_by_date = {entry.date: entry.weight for entry in weight_entries}
+   
+   chart_data = []
+   current_date = start_date
+   while current_date <= end_date:
+       nutrition = nutrition_by_date.get(current_date, {'protein': None, 'calories': None})
+       chart_data.append({
+           'date': current_date.strftime('%Y-%m-%d'),
+           'protein': nutrition['protein'],
+           'calories': nutrition['calories'],
+           'weight': weight_by_date.get(current_date)
+       })
+       current_date += timedelta(days=1)
+   
+   history = []
+   current_date = end_date
+   while current_date >= start_date:
+       nutrition = nutrition_by_date.get(current_date)
+       day_workout = next((w for w in workouts if w.date.date() == current_date), None)
+       
+       if nutrition:
+           calories_status = (
+               'under_goal' if weight_direction == 'gain' and nutrition['calories'] < settings.max_calories else
+               'over_goal' if weight_direction == 'loss' and nutrition['calories'] > settings.max_calories else
+               'on_target'
+           )
+       else:
+           calories_status = None
+           
+       history.append({
+           'date': current_date,
+           'nutrition': {
+               'protein': nutrition['protein'] if nutrition else 0,
+               'calories': nutrition['calories'] if nutrition else 0,
+               'protein_goal': protein_goal,
+               'calories_status': calories_status
+           },  
+           'workout': {
+               'type': day_workout.type,
+               'exercises': json.loads(day_workout.exercises)
+           } if day_workout else None
+       })
+       current_date -= timedelta(days=1)
+   
+   progress = None
+   total_change = None
+   current_change = None
+   if latest_weight_entry and settings.target_weight_kg and settings.starting_weight_kg:
+       latest_kg = latest_weight_entry.weight
+       target_kg = settings.target_weight_kg
+       starting_kg = settings.starting_weight_kg
+       
+       if weight_direction == 'loss':
+           total_change = starting_kg - target_kg
+           current_change = starting_kg - latest_kg
+       else:
+           total_change = target_kg - starting_kg
+           current_change = latest_kg - starting_kg
+           
+       if total_change != 0:
+           progress = round((current_change / total_change) * 100, 1)
+           progress = min(progress, 100) if progress > 0 else max(progress, -100)
+   
+   return render_template('history.html',
+                        active_tab='history',
+                        history=history,
+                        chart_data=chart_data,
+                        protein_goal=protein_goal,
+                        settings=settings,
+                        max_calories=settings.max_calories,
+                        latest_weight_entry=latest_weight_entry,
+                        progress=progress,
+                        total_change=total_change,
+                        current_change=current_change,
+                        weight_direction=weight_direction)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
