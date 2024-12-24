@@ -15,7 +15,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 0px;
-    margin: 0;
     padding: 0;
 }
 
@@ -106,8 +105,6 @@ h2 {
     display: grid;
     gap: 1rem;
     padding: 1rem;
-    max-width: 800px;
-    margin: 0 auto;
 }
 
 .history-card {
@@ -318,6 +315,18 @@ h2 {
     margin-bottom: 1rem;
 }
 
+.goal-indicator-banner {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 8px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 8px 0;
+}
+
 #editForm label {
     width: 100px;  
     text-align: right;
@@ -437,6 +446,10 @@ h2 {
 
 <h2>Goals and History</h2>
 
+<div class="goal-indicator-banner">
+    Currently in weight {{ 'loss' if weight_direction == 'loss' else 'gain' }} mode
+  </div>
+
 <div class="section">
     <div class="stats-grid">
         <div class="stat-card">
@@ -517,89 +530,91 @@ h2 {
     </div>
 {% endif %}
 
-<div class="history-cards">
-    {% for entry in history %}
-    <div class="history-card">
+<div class="section">
+    <div class="history-cards">
+      {% for entry in history %}
+      <div class="history-card">
         <div class="history-card-header">
-            <span class="history-card-date">{{ entry.date.strftime('%B %d, %Y') }}</span>
-            <button onclick="openEditModal('{{ entry.date.strftime('%Y-%m-%d') }}', {{ entry.nutrition.protein if entry.nutrition else 0 }}, {{ entry.nutrition.calories if entry.nutrition else 0 }})">
-                Edit
-            </button>
+          <span class="history-card-date">{{ entry.date.strftime('%B %d, %Y') }}</span>
+          <button onclick="openEditModal('{{ entry.date.strftime('%Y-%m-%d') }}', {{ entry.nutrition.protein if entry.nutrition else 0 }}, {{ entry.nutrition.calories if entry.nutrition else 0 }})">
+            Edit
+          </button>
         </div>
         
         <div class="history-card-content">
-            {% if entry.nutrition %}
-            <div class="nutrition-section">
-                <div class="nutrition-stat">
-                    <div class="stat-with-goal">
-                        <strong>Protein:</strong> 
-                        {% if entry.nutrition.protein != 0 %}
-                            {{ entry.nutrition.protein }}g
-                            {% if entry.nutrition.protein >= entry.nutrition.protein_goal %}
-                                <span class="goal-indicator goal-reached">Goal reached</span>
-                            {% else %}
-                                <span class="goal-indicator goal-not-reached">
-                                    {{ entry.nutrition.protein }}g/{{ entry.nutrition.protein_goal }}g
-                                </span>
-                            {% endif %}
-                        {% else %}
-                            No entries yet
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="nutrition-stat">
-                    <div class="stat-with-goal">
-                        <strong>Calories:</strong>
-                        {% if entry.nutrition.calories != 0 %}
-                            {{ entry.nutrition.calories }}
-                            {% if weight_direction == 'loss' %}
-                                {% if entry.nutrition.calories <= max_calories %}
-                                    <span class="goal-indicator goal-reached">On target</span>
-                                {% else %}
-                                    <span class="goal-indicator goal-not-reached">
-                                        Over by {{ entry.nutrition.calories - max_calories }}
-                                    </span>
-                                {% endif %}
-                            {% else %}  {# gain mode #}
-                                {% if entry.nutrition.calories >= max_calories %}
-                                    <span class="goal-indicator goal-reached">Goal reached</span>
-                                {% else %}
-                                    <span class="goal-indicator goal-not-reached">
-                                        Need {{ max_calories - entry.nutrition.calories }} more
-                                    </span>
-                                {% endif %}
-                            {% endif %}
-                        {% else %}
-                            No entries yet
-                        {% endif %}
-                    </div>
-                </div>
+          {% if entry.nutrition %}
+          <div class="nutrition-section">
+            <div class="nutrition-stat">
+              <div class="stat-with-goal">
+                <strong>Protein:</strong> 
+                {% if entry.nutrition.protein != 0 %}
+                  {{ entry.nutrition.protein }}g
+                  {% if entry.nutrition.protein >= entry.nutrition.protein_goal %}
+                    <span class="goal-indicator goal-reached">Goal reached</span>
+                  {% else %}
+                    <span class="goal-indicator goal-not-reached">
+                      {{ entry.nutrition.protein }}g/{{ entry.nutrition.protein_goal }}g
+                    </span>
+                  {% endif %}
+                {% else %}
+                  No entries yet
+                {% endif %}
+              </div>
             </div>
-            {% endif %}
-
-            {% if entry.workout %}
-            <div class="workout-section">
-                <div class="workout-header" onclick="toggleWorkout(this)">
-                    <strong>Workout:</strong>
-                    <div class="workout-type">
-                        {{ entry.workout.type }}
-                        <span class="chevron">›</span>
-                    </div>
-                </div>
-                <div class="workout-content">    
-                    <div class="exercise-list">
-                        {% for exercise in entry.workout.exercises %}
-                        <div class="exercise-item">
-                            {{ exercise.name }}: {{ exercise.weight }}lbs × {{ exercise.sets }}×{{ exercise.reps }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+            <div class="nutrition-stat">
+              <div class="stat-with-goal">
+                <strong>Calories:</strong>
+                {% if entry.nutrition.calories != 0 %}
+                  {{ entry.nutrition.calories }}
+                  {% if weight_direction == 'loss' %}
+                    {% if entry.nutrition.calories <= max_calories %}
+                      <span class="goal-indicator goal-reached">On target</span>
+                    {% else %}
+                      <span class="goal-indicator goal-not-reached">
+                        Over by {{ entry.nutrition.calories - max_calories }}
+                      </span>
+                    {% endif %}
+                  {% else %}
+                    {% if entry.nutrition.calories >= max_calories %}
+                      <span class="goal-indicator goal-reached">Goal reached</span>
+                    {% else %}
+                      <span class="goal-indicator goal-not-reached">
+                        Need {{ max_calories - entry.nutrition.calories }} more
+                      </span>
+                    {% endif %}
+                  {% endif %}
+                {% else %}
+                  No entries yet
+                {% endif %}
+              </div>
             </div>
-            {% endif %}
+          </div>
+          {% endif %}
+  
+          {% if entry.workout %}
+          <div class="workout-section">
+            <div class="workout-header" onclick="toggleWorkout(this)">
+              <strong>Workout:</strong>
+              <div class="workout-type">
+                {{ entry.workout.type }}
+                <span class="chevron">›</span>
+              </div>
+            </div>
+            <div class="workout-content">    
+              <div class="exercise-list">
+                {% for exercise in entry.workout.exercises %}
+                <div class="exercise-item">
+                  {{ exercise.name }}: {{ exercise.weight }}lbs × {{ exercise.sets }}×{{ exercise.reps }}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% endif %}
         </div>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
 </div>
 
 <div id="editModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">

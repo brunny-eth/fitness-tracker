@@ -2,6 +2,11 @@
 {% block content %}
 
 <h2>{{ date }}</h2>
+
+<div class="goal-indicator-banner">
+  Currently in weight {{ 'loss' if weight_direction == 'loss' else 'gain' }} mode
+</div>
+
 <div class="section">
   <div class="stats-grid">
     <div class="stat-card">
@@ -414,6 +419,18 @@ h2:first-of-type {
 .exercise-field input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+.goal-indicator-banner {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 8px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 8px 0;
 }
 
 .exercise-field label {
