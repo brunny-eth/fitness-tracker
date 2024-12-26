@@ -1135,6 +1135,19 @@ def update_workout(workout_id):
         logging.error(f"Error updating workout: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    try:
+        user = current_user
+        db.session.delete(user)
+        db.session.commit()
+        logout_user()
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
 # app runner
 if __name__ == '__main__':
     with app.app_context():
