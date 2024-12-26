@@ -253,6 +253,24 @@
             background: white;
         }
 
+        .header-title {
+            margin-bottom: 24px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-email {
+            font-size: 16px;
+            font-weight: normal;
+            color: #6b7280;
+        }
+
         @media (max-width: 640px) {
             .container {
                 padding: 16px 12px;
@@ -288,13 +306,29 @@
             .form-group input {
                 font-size: 16px; 
             }
+
+            .header-title h1 {
+                font-size: 22px;
+            }
+
+            .user-email {
+                font-size: 14px;
+            }
+
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Fitness Tracker</h1>
+            <div class="header-title">
+                <h1>
+                    Fitness Tracker 
+                    {% if current_user.is_authenticated %}
+                        <span class="user-email">(User = {{ current_user.email }})</span>
+                    {% endif %}
+                </h1>
+            </div>
             
             <div class="tabs">
                 <a href="/nutrition" class="tab {% if active_tab == 'nutrition' %}active{% endif %}">Nutrition</a>
@@ -306,7 +340,7 @@
                 {% endif %}
             </div>
         </div>
-
+    
         {% block content %}{% endblock %}
     </div>
 </body>

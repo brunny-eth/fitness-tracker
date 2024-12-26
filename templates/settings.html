@@ -852,24 +852,37 @@ function closeDeleteModal() {
 function deleteAccount() {
     const enteredEmail = document.getElementById('confirmEmail').value;
     if (enteredEmail !== '{{ current_user.email }}') {
-        alert('No account found with that email address');  // More user-friendly message
+        alert('No account found with that email address');
         return;
     }
     
     if (confirm('Are you absolutely sure? This cannot be undone.')) {
         fetch('/delete_account', {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                email: enteredEmail
+            })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 window.location.href = '/';
             } else {
-                alert('Unable to delete account. Please try again later.');  // More user-friendly error
+                throw new Error(data.error || 'Unable to delete account');
             }
         })
         .catch(error => {
-            alert('Unable to delete account. Please try again later.');  // Catch network errors
+            console.error('Delete account error:', error);
+            alert(error.error || error.message || 'Unable to delete account. Please try again later.');
         });
     }
 }

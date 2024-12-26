@@ -1136,17 +1136,56 @@ def update_workout(workout_id):
         return jsonify({"error": str(e)}), 500
 
 @app.route('/delete_account', methods=['POST'])
-@login_required
+@login_required  
 def delete_account():
     try:
-        user = current_user
-        db.session.delete(user)
-        db.session.commit()
-        logout_user()
-        return jsonify({"success": True}), 200
+        # Get the email from the request
+        entered_email = request.json.get('email')
+        
+        # Log the attempt for debugging
+        logging.info(f"Delete account attempt for user {current_user.email}")
+        
+        # Verify the logged-in user matches the email
+        if not entered_email:
+            return jsonify({
+                "success": False, 
+                "error": "Email is required"
+            }), 400
+            
+        if entered_email != current_user.email:
+            return jsonify({
+                "success": False, 
+                "error": "Email address does not match your account"
+            }), 403
+            
+        try:
+            # Delete all related records first
+            UserSettings.query.filter_by(user_id=current_user.id).delete()
+            SavedMeal.query.filter_by(user_id=current_user.id).delete()
+            NutritionEntry.query.filter_by(user_id=current_user.id).delete()
+            Workout.query.filter_by(user_id=current_user.id).delete()
+            WorkoutCategory.query.filter_by(user_id=current_user.id).delete()
+            WeightEntry.query.filter_by(user_id=current_user.id).delete()
+            
+            # Now delete the user
+            db.session.delete(current_user)
+            db.session.commit()
+            logout_user()
+            
+            return jsonify({"success": True}), 200
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Database error during account deletion: {str(e)}")
+            raise
+            
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
+        logging.error(f"Error in delete_account: {str(e)}")
+        return jsonify({
+            "success": False, 
+            "error": "Unable to delete account. Please try again later."
+        }), 500
 
 # app runner
 if __name__ == '__main__':

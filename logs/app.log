@@ -4100,3 +4100,32 @@
 2024-12-26 14:01:52,924 INFO: 127.0.0.1 - - [26/Dec/2024 14:01:52] "[35m[1mPOST /delete_account HTTP/1.1[0m" 500 -
 2024-12-26 14:01:58,092 INFO: 127.0.0.1 - - [26/Dec/2024 14:01:58] "[35m[1mPOST /delete_account HTTP/1.1[0m" 500 -
 2024-12-26 14:02:47,132 INFO: 127.0.0.1 - - [26/Dec/2024 14:02:47] "GET /settings HTTP/1.1" 200 -
+2024-12-26 14:04:11,245 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-26 14:04:11,368 INFO:  * Restarting with stat
+2024-12-26 14:04:11,770 INFO: Application startup
+2024-12-26 14:04:11,802 WARNING:  * Debugger is active!
+2024-12-26 14:04:11,807 INFO:  * Debugger PIN: 133-619-259
+2024-12-26 14:04:23,348 INFO: 127.0.0.1 - - [26/Dec/2024 14:04:23] "GET /settings HTTP/1.1" 200 -
+2024-12-26 14:04:44,791 INFO: 127.0.0.1 - - [26/Dec/2024 14:04:44] "[35m[1mPOST /delete_account HTTP/1.1[0m" 500 -
+2024-12-26 14:05:00,940 INFO: 127.0.0.1 - - [26/Dec/2024 14:05:00] "[35m[1mPOST /delete_account HTTP/1.1[0m" 500 -
+2024-12-26 14:05:57,920 INFO: 127.0.0.1 - - [26/Dec/2024 14:05:57] "GET /history HTTP/1.1" 200 -
+2024-12-26 14:05:58,574 INFO: 127.0.0.1 - - [26/Dec/2024 14:05:58] "GET /workouts HTTP/1.1" 200 -
+2024-12-26 14:05:59,321 INFO: 127.0.0.1 - - [26/Dec/2024 14:05:59] "GET /nutrition HTTP/1.1" 200 -
+2024-12-26 14:06:00,720 INFO: 127.0.0.1 - - [26/Dec/2024 14:06:00] "GET /settings HTTP/1.1" 200 -
+2024-12-26 14:06:01,277 INFO: 127.0.0.1 - - [26/Dec/2024 14:06:01] "GET /history HTTP/1.1" 200 -
+2024-12-26 14:08:00,560 INFO: 127.0.0.1 - - [26/Dec/2024 14:08:00] "GET /history HTTP/1.1" 200 -
+2024-12-26 14:09:09,648 INFO: 127.0.0.1 - - [26/Dec/2024 14:09:09] "GET /history HTTP/1.1" 200 -
+2024-12-26 14:09:11,893 INFO: 127.0.0.1 - - [26/Dec/2024 14:09:11] "GET /workouts HTTP/1.1" 200 -
+2024-12-26 14:09:12,771 INFO: 127.0.0.1 - - [26/Dec/2024 14:09:12] "GET /nutrition HTTP/1.1" 200 -
+2024-12-26 14:09:13,495 INFO: 127.0.0.1 - - [26/Dec/2024 14:09:13] "GET /history HTTP/1.1" 200 -
+2024-12-26 14:09:14,017 INFO: 127.0.0.1 - - [26/Dec/2024 14:09:14] "GET /settings HTTP/1.1" 200 -
+2024-12-26 14:09:20,549 INFO: 127.0.0.1 - - [26/Dec/2024 14:09:20] "[35m[1mPOST /delete_account HTTP/1.1[0m" 500 -
+2024-12-26 14:10:31,792 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-26 14:10:31,911 INFO:  * Restarting with stat
+2024-12-26 14:10:32,289 INFO: Application startup
+2024-12-26 14:10:32,326 WARNING:  * Debugger is active!
+2024-12-26 14:10:32,331 INFO:  * Debugger PIN: 133-619-259
+2024-12-26 14:10:32,929 INFO: 127.0.0.1 - - [26/Dec/2024 14:10:32] "GET /settings HTTP/1.1" 200 -
+2024-12-26 14:10:39,920 INFO: Delete account attempt for user brunny@brunny.com
+2024-12-26 14:10:39,933 INFO: 127.0.0.1 - - [26/Dec/2024 14:10:39] "POST /delete_account HTTP/1.1" 200 -
+2024-12-26 14:10:39,944 INFO: 127.0.0.1 - - [26/Dec/2024 14:10:39] "GET / HTTP/1.1" 200 -
