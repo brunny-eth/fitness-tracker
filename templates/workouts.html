@@ -73,8 +73,7 @@
           </div>
         </div>
         <div class="category-actions">
-          <button class="edit-btn" onclick="event.stopPropagation(); editCategory('{{ category.name }}')">
-            Edit
+          <button class="edit-btn" onclick="event.stopPropagation(); editCategory('{{ category.name }}', {{ category.id }})">            Edit Workout Category
           </button>
           <span class="chevron">›</span>
         </div>
@@ -82,11 +81,10 @@
     {% endfor %}
 
     <button class="add-category-btn" onclick="showCategoryModal()">
-      + Add New Workout Day
+      + Add New Workout Category
     </button>
   </div>
 </div>
-
 
 <div id="categoryModal" class="modal">
   <div class="modal-content">
@@ -109,6 +107,7 @@
       </div>
       <div class="form-buttons">
         <button type="submit" class="save-btn">Save</button>
+        <button type="button" class="delete-category-btn" onclick="deleteCategory()" style="display: none;">Delete</button>
         <button type="button" onclick="closeCategoryModal()" class="cancel-btn">Cancel</button>
       </div>
     </form>
@@ -510,6 +509,20 @@ h2:first-of-type {
     transition: all 0.2s ease;
 }
 
+.delete-category-btn {
+  flex: 1;
+  padding: 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-category-btn:hover {
+  background: #dc2626;
+}
+
 .delete-btn:hover {
     background-color: #fee2e2;
     color: #ef4444;
@@ -621,11 +634,13 @@ function showCategoryModal(categoryIdParam = null) {
     const categoryIdInput = document.getElementById('categoryId');  
     const categoryNameInput = document.getElementById('categoryName');
     const exercisesList = document.getElementById('exercisesList');
+    const deleteBtn = document.querySelector('.delete-category-btn');
     
     modalTitle.textContent = categoryIdParam ? 'Edit Workout Day' : 'Add New Workout Day';
     categoryNameInput.value = '';
     exercisesList.innerHTML = '';
     categoryIdInput.value = ''; 
+    deleteBtn.style.display = categoryIdParam ? 'block' : 'none';
     
     if (categoryIdParam) {
         fetch(`/get_workout_category/${categoryIdParam}`)
@@ -798,27 +813,50 @@ function deleteWorkout(workoutId) {
     }
 }
 
-function editCategory(categoryName) {
+function editCategory(categoryName, categoryId) {
     const modal = document.getElementById('categoryModal');
     const modalTitle = document.getElementById('modalTitle');
-    const categoryForm = document.getElementById('categoryForm');
     const categoryNameInput = document.getElementById('categoryName');
     const exercisesList = document.getElementById('exercisesList');
+    const deleteBtn = document.querySelector('.delete-category-btn');
     
     modalTitle.textContent = 'Edit Workout Day';
     exercisesList.innerHTML = '';
+    document.getElementById('categoryId').value = categoryId;
+    deleteBtn.style.display = 'block';
     
-    fetch('/get_workout_categories')
+    fetch(`/get_workout_category/${categoryId}`)
         .then(response => response.json())
-        .then(categories => {
-            const category = categories.find(c => c.name === categoryName);
-            if (category) {
-                categoryNameInput.value = category.name;
-                category.exercises.forEach(exercise => addExerciseInput(exercise));
-            }
+        .then(data => {
+            categoryNameInput.value = data.name;
+            data.exercises.forEach(exercise => addExerciseInput(exercise));
         });
     
     modal.style.display = 'block';
+}
+
+
+function deleteCategory() {
+    const categoryId = document.getElementById('categoryId').value;
+    if (!categoryId) return;
+    
+    if (confirm('Are you sure you want to delete this workout day?')) {
+        fetch(`/delete_workout_category/${categoryId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Error deleting category');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting category');
+        });
+    }
 }
 
 document.getElementById('workoutForm').addEventListener('submit', function(e) {
