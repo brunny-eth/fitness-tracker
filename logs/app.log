@@ -4433,3 +4433,237 @@
 2024-12-27 14:10:31,857 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
 2024-12-27 14:10:31,858 INFO: Successfully added nutrition entry
 2024-12-27 14:10:31,936 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:10:52,888 INFO: 127.0.0.1 - - [27/Dec/2024 14:10:52] "[35m[1mGET /history HTTP/1.1[0m" 500 -
+2024-12-27 14:10:52,903 INFO: 127.0.0.1 - - [27/Dec/2024 14:10:52] "[36mGET /history?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:10:52,905 INFO: 127.0.0.1 - - [27/Dec/2024 14:10:52] "[36mGET /history?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:10:53,019 INFO: 127.0.0.1 - - [27/Dec/2024 14:10:53] "GET /history?__debugger__=yes&cmd=resource&f=console.png&s=C3bInIKMSSERoxaYYfwy HTTP/1.1" 200 -
+2024-12-27 14:10:53,021 INFO: 127.0.0.1 - - [27/Dec/2024 14:10:53] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:10:53,124 INFO: 127.0.0.1 - - [27/Dec/2024 14:10:53] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:11:49,129 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/tests/conftest.py', reloading
+2024-12-27 14:11:49,242 INFO:  * Restarting with stat
+2024-12-27 14:11:49,596 INFO: Application startup
+2024-12-27 14:11:49,632 WARNING:  * Debugger is active!
+2024-12-27 14:11:49,637 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:11:59,544 INFO: Application startup
+2024-12-27 14:11:59,805 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:11:59,806 INFO: Successfully added nutrition entry
+2024-12-27 14:11:59,883 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:12:02,970 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:02] "[35m[1mGET /history HTTP/1.1[0m" 500 -
+2024-12-27 14:12:02,985 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:02] "[36mGET /history?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:12:02,985 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:02] "[36mGET /history?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,041 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "GET /history?__debugger__=yes&cmd=resource&f=console.png&s=3cYctHKzzMZACfLQ9BYk HTTP/1.1" 200 -
+2024-12-27 14:12:03,042 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,089 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,580 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[35m[1mGET /history HTTP/1.1[0m" 500 -
+2024-12-27 14:12:03,591 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,592 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,644 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png&s=3cYctHKzzMZACfLQ9BYk HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,647 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:12:03,689 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:03] "[36mGET /history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:12:07,937 INFO: Application startup
+2024-12-27 14:12:07,991 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.99:5001
+2024-12-27 14:12:07,991 INFO: [33mPress CTRL+C to quit[0m
+2024-12-27 14:12:07,992 INFO:  * Restarting with stat
+2024-12-27 14:12:08,332 INFO: Application startup
+2024-12-27 14:12:08,362 WARNING:  * Debugger is active!
+2024-12-27 14:12:08,367 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:12:10,253 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:10] "[32mGET /history HTTP/1.1[0m" 302 -
+2024-12-27 14:12:10,260 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:10] "GET /login?next=/history HTTP/1.1" 200 -
+2024-12-27 14:12:11,520 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:11] "[32mGET /workouts HTTP/1.1[0m" 302 -
+2024-12-27 14:12:11,525 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:11] "GET /login?next=/workouts HTTP/1.1" 200 -
+2024-12-27 14:12:12,210 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:12] "[32mGET /nutrition HTTP/1.1[0m" 302 -
+2024-12-27 14:12:12,215 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:12] "GET /login?next=/nutrition HTTP/1.1" 200 -
+2024-12-27 14:12:13,322 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:13] "[32mGET /settings HTTP/1.1[0m" 302 -
+2024-12-27 14:12:13,331 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:13] "GET /login?next=/settings HTTP/1.1" 200 -
+2024-12-27 14:12:13,655 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:13] "[32mGET /history HTTP/1.1[0m" 302 -
+2024-12-27 14:12:13,659 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:13] "GET /login?next=/history HTTP/1.1" 200 -
+2024-12-27 14:12:14,704 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:14] "GET /register HTTP/1.1" 200 -
+2024-12-27 14:12:40,617 ERROR: Error calculating calories: Goal date has passed
+2024-12-27 14:12:40,623 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:40] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 14:12:40,635 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:40] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 14:12:42,992 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:42] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:12:43,005 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:43] "GET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2024-12-27 14:12:43,010 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:43] "GET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2024-12-27 14:12:43,061 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:43] "GET /settings?__debugger__=yes&cmd=resource&f=console.png&s=hvzwl55EpdjRTRvzcWb0 HTTP/1.1" 200 -
+2024-12-27 14:12:43,061 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:43] "GET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2024-12-27 14:12:43,110 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:43] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:12:47,658 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:47] "GET /history HTTP/1.1" 200 -
+2024-12-27 14:12:48,460 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:48] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 14:12:49,217 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:49] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:12:49,230 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:12:49,235 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:12:49,287 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:12:49,287 INFO: 127.0.0.1 - - [27/Dec/2024 14:12:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=hvzwl55EpdjRTRvzcWb0 HTTP/1.1[0m" 304 -
+2024-12-27 14:14:00,186 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:14:00,295 INFO:  * Restarting with stat
+2024-12-27 14:14:00,668 INFO: Application startup
+2024-12-27 14:14:00,700 WARNING:  * Debugger is active!
+2024-12-27 14:14:00,705 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:14:00,860 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:00] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:14:00,873 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:00] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:14:00,874 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:00] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:14:00,930 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:00] "GET /settings?__debugger__=yes&cmd=resource&f=console.png&s=v3XiYQ7XeCDgminV6X3A HTTP/1.1" 200 -
+2024-12-27 14:14:00,930 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:00] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:00,972 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:00] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,462 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:14:01,478 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,482 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,537 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=v3XiYQ7XeCDgminV6X3A HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,538 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,573 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,649 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:14:01,661 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,661 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,713 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=v3XiYQ7XeCDgminV6X3A HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,714 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,749 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,829 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:14:01,838 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,840 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,890 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=v3XiYQ7XeCDgminV6X3A HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,891 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:14:01,927 INFO: 127.0.0.1 - - [27/Dec/2024 14:14:01] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:44,175 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:16:44,280 INFO:  * Restarting with stat
+2024-12-27 14:16:44,654 INFO: Application startup
+2024-12-27 14:16:44,686 WARNING:  * Debugger is active!
+2024-12-27 14:16:44,691 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:16:47,732 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:16:47,848 INFO:  * Restarting with stat
+2024-12-27 14:16:48,221 INFO: Application startup
+2024-12-27 14:16:48,252 WARNING:  * Debugger is active!
+2024-12-27 14:16:48,257 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:16:48,665 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:48] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:16:48,682 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:48] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:16:48,682 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:48] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:16:48,736 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:48] "GET /settings?__debugger__=yes&cmd=resource&f=console.png&s=DqqOIUrVp7o4ClP0ti1I HTTP/1.1" 200 -
+2024-12-27 14:16:48,736 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:48] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:48,772 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:48] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,296 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:16:49,305 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,307 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,358 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=DqqOIUrVp7o4ClP0ti1I HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,358 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,395 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,499 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:16:49,509 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,510 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,561 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=DqqOIUrVp7o4ClP0ti1I HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,561 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,598 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,682 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:16:49,690 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,693 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,743 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=DqqOIUrVp7o4ClP0ti1I HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,743 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,776 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,862 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:16:49,873 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,873 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,925 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=DqqOIUrVp7o4ClP0ti1I HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,926 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:49,959 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:49] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:50,076 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:50] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:16:50,086 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:50] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:16:50,086 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:50] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:16:50,139 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:50] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=DqqOIUrVp7o4ClP0ti1I HTTP/1.1[0m" 304 -
+2024-12-27 14:16:50,139 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:50] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:16:50,173 INFO: 127.0.0.1 - - [27/Dec/2024 14:16:50] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:04,387 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:19:04,477 INFO:  * Restarting with stat
+2024-12-27 14:19:04,831 INFO: Application startup
+2024-12-27 14:19:04,884 WARNING:  * Debugger is active!
+2024-12-27 14:19:04,890 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:19:24,219 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:19:24,316 INFO:  * Restarting with stat
+2024-12-27 14:19:24,661 INFO: Application startup
+2024-12-27 14:19:24,695 WARNING:  * Debugger is active!
+2024-12-27 14:19:24,700 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:19:33,869 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:19:33,962 INFO:  * Restarting with stat
+2024-12-27 14:19:34,319 INFO: Application startup
+2024-12-27 14:19:34,349 WARNING:  * Debugger is active!
+2024-12-27 14:19:34,354 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:19:35,077 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:35,090 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,093 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,149 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "GET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1" 200 -
+2024-12-27 14:19:35,149 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,187 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,608 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:35,618 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,619 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,672 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,673 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,704 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,822 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:35,833 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,833 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,884 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,885 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,921 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:35,990 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:35,998 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:35] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,000 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,052 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,052 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,092 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,165 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:36,174 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,175 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,227 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,227 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,263 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,332 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:36,341 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,341 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,394 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,395 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,428 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,526 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:36,536 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,537 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,590 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=iYL5YNTZJd4DvpIg775J HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,591 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:36,626 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:36] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:42,678 INFO: Application startup
+2024-12-27 14:19:42,727 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.99:5001
+2024-12-27 14:19:42,727 INFO: [33mPress CTRL+C to quit[0m
+2024-12-27 14:19:42,727 INFO:  * Restarting with stat
+2024-12-27 14:19:43,071 INFO: Application startup
+2024-12-27 14:19:43,103 WARNING:  * Debugger is active!
+2024-12-27 14:19:43,108 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:19:45,338 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:45] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:45,359 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:45] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:45,359 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:45] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:45,409 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:45] "GET /settings?__debugger__=yes&cmd=resource&f=console.png&s=tHg4hu0TkyXS4pJMzrNp HTTP/1.1" 200 -
+2024-12-27 14:19:45,410 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:45] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:45,443 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:45] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:46,127 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:46] "[35m[1mGET /settings HTTP/1.1[0m" 500 -
+2024-12-27 14:19:46,142 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:46] "[36mGET /settings?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 14:19:46,143 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:46] "[36mGET /settings?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 14:19:46,200 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:46] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png&s=tHg4hu0TkyXS4pJMzrNp HTTP/1.1[0m" 304 -
+2024-12-27 14:19:46,201 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:46] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:19:46,234 INFO: 127.0.0.1 - - [27/Dec/2024 14:19:46] "[36mGET /settings?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 14:21:30,805 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:21:30,929 INFO:  * Restarting with stat
+2024-12-27 14:21:31,296 INFO: Application startup
+2024-12-27 14:21:31,334 WARNING:  * Debugger is active!
+2024-12-27 14:21:31,343 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:21:31,376 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:31] "GET /settings HTTP/1.1" 200 -
+2024-12-27 14:21:31,983 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:31] "GET /settings HTTP/1.1" 200 -
+2024-12-27 14:21:34,187 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:34] "GET /history HTTP/1.1" 200 -
+2024-12-27 14:21:34,814 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:34] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 14:21:35,443 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:35] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 14:21:36,477 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:36] "GET /settings HTTP/1.1" 200 -
+2024-12-27 14:21:37,048 INFO: 127.0.0.1 - - [27/Dec/2024 14:21:37] "GET /history HTTP/1.1" 200 -
+2024-12-27 14:21:43,354 INFO: Application startup
+2024-12-27 14:21:43,617 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:21:43,618 INFO: Successfully added nutrition entry
+2024-12-27 14:21:43,696 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}

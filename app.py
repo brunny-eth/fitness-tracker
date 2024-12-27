@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, date, timedelta, UTC 
+from datetime import datetime, date, timedelta, UTC
 import json
 import requests
 from anthropic import Anthropic
@@ -72,6 +72,13 @@ class UserSettings(db.Model):
     height_inches = db.Column(db.Float, nullable=False)
     age = db.Column(db.Integer, nullable=False)
 
+    @property
+    def start_date_utc(self):
+        """Ensure start_date is always timezone-aware"""
+        if self.start_date.tzinfo is None:
+            return self.start_date.replace(tzinfo=UTC)
+        return self.start_date
+
 class WeightEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -134,7 +141,6 @@ def calculate_protein_goal(weight_kg, ratio, direction='loss'):
         
     return round(weight_for_calculation * ratio)
 
-
 def calculate_calorie_target(current_weight_kg, settings):
     """Calculate daily calorie target based on current weight and goals"""
     try:
@@ -149,12 +155,12 @@ def calculate_calorie_target(current_weight_kg, settings):
         ]):
             raise ValueError("Missing required settings")
             
-        goal_date = settings.start_date + timedelta(days=settings.goal_months * 30.44)
+        goal_date = settings.start_date_utc + timedelta(days=settings.goal_months * 30.44)
         days_remaining = (goal_date - datetime.now(UTC)).days
         
         if days_remaining <= 0:
             raise ValueError("Goal date has passed")
-            
+                        
         height_cm = settings.height_inches * 2.54
         if settings.gender == 'male':
             bmr = 88.362 + (13.397 * current_weight_kg) + (4.799 * height_cm) - (5.677 * settings.age)
@@ -407,10 +413,10 @@ def workouts():
     def workouts_on_date(target_date):
         return Workout.query.filter(
             Workout.user_id == current_user.id,
-            Workout.date >= datetime.combine(target_date, datetime.min.time()),
-            Workout.date < datetime.combine(target_date, datetime.max.time())
+            Workout.date >= datetime.combine(target_date, datetime.min.time()).replace(tzinfo=UTC),
+            Workout.date < datetime.combine(target_date, datetime.max.time()).replace(tzinfo=UTC)
         ).order_by(Workout.date.desc()).all()
-    
+
     todays_workouts = workouts_on_date(today)
     worked_out_today = len(todays_workouts) > 0 
         
@@ -586,10 +592,10 @@ def history():
    ).all()
    
    workouts = Workout.query.filter(
-       Workout.user_id == current_user.id,
-       Workout.date >= datetime.combine(start_date, datetime.min.time()),
-       Workout.date <= datetime.combine(end_date, datetime.max.time())
-   ).all()
+        Workout.user_id == current_user.id,
+        Workout.date >= datetime.combine(start_date, datetime.min.time()).replace(tzinfo=UTC),
+        Workout.date <= datetime.combine(end_date, datetime.max.time()).replace(tzinfo=UTC)
+    ).all()
    
    nutrition_by_date = {}
    for entry in nutrition_entries:
@@ -753,7 +759,7 @@ def register():
                 gender=gender,
                 height_inches=height_cm / 2.54,
                 protein_ratio=protein_ratio,
-                start_date=datetime.now(UTC)
+                start_date=datetime.now(UTC) 
             )
             
             # Calculate initial calories considering direction
@@ -816,17 +822,19 @@ def settings():
         user_id=current_user.id
     ).order_by(WeightEntry.date.desc()).first()
     
-    # Calculate time remaining
+    # Calculate time remaining with proper timezone handling
     months_remaining = None
     if settings.start_date and settings.goal_months:
-        start_date = settings.start_date
+        start_date = settings.start_date_utc  # Use the property to ensure UTC
         goal_date = start_date + timedelta(days=settings.goal_months * 30.44)
+        
+        # Both datetimes are now timezone-aware
         days_remaining = (goal_date - datetime.now(UTC)).days
         months_remaining = round(days_remaining / 30.44, 1)
     
     weight_direction = determine_weight_direction(
-    latest_weight.weight if latest_weight else settings.current_weight_kg,
-    settings.target_weight_kg
+        latest_weight.weight if latest_weight else settings.current_weight_kg,
+        settings.target_weight_kg
     )
 
     return render_template('settings.html',
