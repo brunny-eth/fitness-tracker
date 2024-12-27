@@ -856,35 +856,33 @@ function deleteAccount() {
         return;
     }
     
-    if (confirm('Are you absolutely sure? This cannot be undone.')) {
-        fetch('/delete_account', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                email: enteredEmail
-            })
+    fetch('/delete_account', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            email: enteredEmail
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => Promise.reject(err));
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                window.location.href = '/';
-            } else {
-                throw new Error(data.error || 'Unable to delete account');
-            }
-        })
-        .catch(error => {
-            console.error('Delete account error:', error);
-            alert(error.error || error.message || 'Unable to delete account. Please try again later.');
-        });
-    }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            throw new Error(data.error || 'Unable to delete account');
+        }
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        alert(error.error || error.message || 'Unable to delete account. Please try again later.');
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {

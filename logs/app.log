@@ -4129,3 +4129,98 @@
 2024-12-26 14:10:39,920 INFO: Delete account attempt for user brunny@brunny.com
 2024-12-26 14:10:39,933 INFO: 127.0.0.1 - - [26/Dec/2024 14:10:39] "POST /delete_account HTTP/1.1" 200 -
 2024-12-26 14:10:39,944 INFO: 127.0.0.1 - - [26/Dec/2024 14:10:39] "GET / HTTP/1.1" 200 -
+2024-12-27 09:09:38,429 INFO: 127.0.0.1 - - [27/Dec/2024 09:09:38] "GET /register HTTP/1.1" 200 -
+2024-12-27 09:10:00,073 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:00] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 09:10:00,084 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:00] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:10:03,614 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:03] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:10:04,782 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:04] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:10:08,152 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:08] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:10:10,256 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:10] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:10:10,637 INFO: 127.0.0.1 - - [27/Dec/2024 09:10:10] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:21:03,692 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:03] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:21:04,722 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:04] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:21:06,909 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 09:21:07,005 INFO:  * Restarting with stat
+2024-12-27 09:21:07,629 INFO: Application startup
+2024-12-27 09:21:07,670 WARNING:  * Debugger is active!
+2024-12-27 09:21:07,676 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 09:21:09,224 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:09] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:21:10,027 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:10] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:21:22,562 INFO: Delete account attempt for user bruno1@bruno1.com
+2024-12-27 09:21:22,579 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:22] "POST /delete_account HTTP/1.1" 200 -
+2024-12-27 09:21:22,604 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:22] "GET / HTTP/1.1" 200 -
+2024-12-27 09:21:24,297 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:24] "GET /register HTTP/1.1" 200 -
+2024-12-27 09:21:51,787 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:51] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 09:21:51,790 INFO: 127.0.0.1 - - [27/Dec/2024 09:21:51] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:22:35,908 INFO: Application startup
+2024-12-27 09:22:35,956 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.99:5001
+2024-12-27 09:22:35,956 INFO: [33mPress CTRL+C to quit[0m
+2024-12-27 09:22:35,956 INFO:  * Restarting with stat
+2024-12-27 09:22:36,303 INFO: Application startup
+2024-12-27 09:22:36,336 WARNING:  * Debugger is active!
+2024-12-27 09:22:36,341 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 09:22:41,264 INFO: 127.0.0.1 - - [27/Dec/2024 09:22:41] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:22:48,592 INFO: Delete account attempt for user bruno1@bruno1.com
+2024-12-27 09:22:48,604 INFO: 127.0.0.1 - - [27/Dec/2024 09:22:48] "POST /delete_account HTTP/1.1" 200 -
+2024-12-27 09:22:48,614 INFO: 127.0.0.1 - - [27/Dec/2024 09:22:48] "GET / HTTP/1.1" 200 -
+2024-12-27 09:22:50,218 INFO: 127.0.0.1 - - [27/Dec/2024 09:22:50] "GET /register HTTP/1.1" 200 -
+2024-12-27 09:23:14,077 INFO: 127.0.0.1 - - [27/Dec/2024 09:23:14] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 09:23:14,089 INFO: 127.0.0.1 - - [27/Dec/2024 09:23:14] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:25:01,707 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 09:25:01,826 INFO:  * Restarting with stat
+2024-12-27 09:25:02,199 INFO: Application startup
+2024-12-27 09:25:02,230 WARNING:  * Debugger is active!
+2024-12-27 09:25:02,236 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 09:25:05,569 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:05] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:25:11,156 INFO: Delete account attempt for user bruno1@bruno1.com
+2024-12-27 09:25:11,176 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:11] "POST /delete_account HTTP/1.1" 200 -
+2024-12-27 09:25:11,198 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:11] "GET / HTTP/1.1" 200 -
+2024-12-27 09:25:13,421 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:13] "GET /register HTTP/1.1" 200 -
+2024-12-27 09:25:34,983 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:34] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 09:25:34,989 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:34] "[35m[1mGET /nutrition HTTP/1.1[0m" 500 -
+2024-12-27 09:25:35,008 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:35] "[36mGET /nutrition?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-12-27 09:25:35,011 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:35] "[36mGET /nutrition?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-12-27 09:25:35,062 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:35] "GET /nutrition?__debugger__=yes&cmd=resource&f=console.png&s=eg3RYfvO64XDf4G518wW HTTP/1.1" 200 -
+2024-12-27 09:25:35,063 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:35] "[36mGET /nutrition?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 09:25:35,109 INFO: 127.0.0.1 - - [27/Dec/2024 09:25:35] "[36mGET /nutrition?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2024-12-27 09:26:21,533 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 09:26:21,656 INFO:  * Restarting with stat
+2024-12-27 09:26:22,051 INFO: Application startup
+2024-12-27 09:26:22,083 WARNING:  * Debugger is active!
+2024-12-27 09:26:22,088 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 09:26:22,702 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:22] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:26:27,699 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:27] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:26:31,003 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:31] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:26:31,754 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:31] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:26:37,802 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:37] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-12-27 09:26:37,808 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:37] "GET /login HTTP/1.1" 200 -
+2024-12-27 09:26:38,888 INFO: 127.0.0.1 - - [27/Dec/2024 09:26:38] "GET /register HTTP/1.1" 200 -
+2024-12-27 09:27:13,487 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:13] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 09:27:13,490 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:13] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:27:26,587 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:26] "POST /add_weight HTTP/1.1" 200 -
+2024-12-27 09:27:26,600 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:26] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:27:29,661 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:29] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:27:30,821 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:30] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:27:32,698 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:32] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:27:33,800 INFO: 127.0.0.1 - - [27/Dec/2024 09:27:33] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:29:15,932 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 09:29:16,060 INFO:  * Restarting with stat
+2024-12-27 09:29:16,430 INFO: Application startup
+2024-12-27 09:29:16,467 WARNING:  * Debugger is active!
+2024-12-27 09:29:16,473 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 09:29:16,515 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:16] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:29:17,248 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:17] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:29:19,046 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:19] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:29:28,363 INFO: Delete account attempt for user test@test1.com
+2024-12-27 09:29:28,383 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:28] "POST /delete_account HTTP/1.1" 200 -
+2024-12-27 09:29:28,405 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:28] "GET / HTTP/1.1" 200 -
+2024-12-27 09:29:29,854 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:29] "GET /register HTTP/1.1" 200 -
+2024-12-27 09:29:49,458 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:49] "[32mPOST /register HTTP/1.1[0m" 302 -
+2024-12-27 09:29:49,469 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:49] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:29:53,069 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:53] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:29:53,817 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:53] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:29:54,400 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:54] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:29:56,007 INFO: 127.0.0.1 - - [27/Dec/2024 09:29:56] "GET /history HTTP/1.1" 200 -

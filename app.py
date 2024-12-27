@@ -127,15 +127,10 @@ def determine_weight_direction(current_weight_kg, target_weight_kg):
     return 'maintain'
 
 def calculate_protein_goal(weight_kg, ratio, direction='loss'):
-    """
-    Calculate protein goal based on weight and direction
-    For weight loss: use target weight for calculation
-    For weight gain: use current weight + 10% for muscle growth support
-    """
+    """Calculate protein goal based on target weight"""
+    weight_for_calculation = weight_kg  # Using passed weight directly
     if direction == 'gain':
-        weight_for_calculation = weight_kg * 1.1
-    else:
-        weight_for_calculation = weight_kg
+        weight_for_calculation *= 1.1  # 10% buffer for muscle growth
         
     return round(weight_for_calculation * ratio)
 
@@ -291,20 +286,22 @@ def nutrition():
     settings = UserSettings.query.filter_by(user_id=current_user.id).first()
     if not settings:
         return redirect(url_for('register'))
-        
-    print("Debug - Settings object:", settings)  
-    print("Debug - Settings attributes:", {
-        'target_weight': settings.target_weight_kg,
-        'current_weight': settings.current_weight_kg,
-        'starting_weight': settings.starting_weight_kg
-    })
 
-    # Get latest weight entry for today    
     today = date.today()
     todays_weight = WeightEntry.query.filter_by(
         user_id=current_user.id,
         date=today
     ).first()
+    
+    current_weight_kg = todays_weight.weight if todays_weight else settings.current_weight_kg
+    weight_direction = determine_weight_direction(current_weight_kg, settings.target_weight_kg)
+    
+    # Calculate protein goal with correct direction
+    protein_goal = calculate_protein_goal(
+        settings.target_weight_kg,
+        settings.protein_ratio,
+        direction=weight_direction  
+    )
     
     # Get nutrition entries for today
     entries = NutritionEntry.query.filter_by(
@@ -315,17 +312,6 @@ def nutrition():
     # Calculate totals
     total_protein = sum(entry.protein_amount for entry in entries)
     total_calories = sum(entry.calorie_amount for entry in entries)
-
-    # Calculate goals based on current weight and direction
-    current_weight_kg = todays_weight.weight if todays_weight else settings.current_weight_kg
-    weight_direction = determine_weight_direction(current_weight_kg, settings.target_weight_kg)
-    
-    # Calculate protein goal considering direction
-    protein_goal = calculate_protein_goal(
-        settings.target_weight_kg, 
-        settings.protein_ratio,
-        direction=weight_direction
-    )
     
     saved_meals = SavedMeal.query.filter_by(user_id=current_user.id).all()
 
