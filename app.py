@@ -613,8 +613,9 @@ def history():
    current_date = end_date
    while current_date >= start_date:
        nutrition = nutrition_by_date.get(current_date)
-       day_workout = next((w for w in workouts if w.date.date() == current_date), None)
-       
+       day_workouts = [w for w in workouts if w.date.date() == current_date]
+       for workout in day_workouts:
+            workout.exercises = json.loads(workout.exercises)  # Parse JSON string to dict
        if nutrition:
            calories_status = (
                'under_goal' if weight_direction == 'gain' and nutrition['calories'] < settings.max_calories else
@@ -632,10 +633,8 @@ def history():
                'protein_goal': protein_goal,
                'calories_status': calories_status
            },  
-           'workout': {
-               'type': day_workout.type,
-               'exercises': json.loads(day_workout.exercises)
-           } if day_workout else None
+           'workout': day_workouts[0] if day_workouts else None,  
+           'workouts': day_workouts  
        })
        current_date -= timedelta(days=1)
    

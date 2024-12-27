@@ -131,7 +131,7 @@ h2 {
 
 .workout-section {
     background: none;
-    padding: 32px;
+    margin-top: 8px;
 }
 
 .chart-placeholder {
@@ -161,8 +161,10 @@ h2 {
 
 .exercise-list {
     display: grid;
-    gap: 0.5rem;
+    gap: 0.75rem;
     font-size: 0.9rem;
+    padding-left: 16px;
+    margin-top: 12px;
 }
 
 .nutrition-section {
@@ -220,6 +222,10 @@ h2 {
 
 .workout-content.show {
     display: block;
+}
+
+.workout-item {
+    margin-bottom: 1rem; 
 }
 
 .chevron {
@@ -577,31 +583,37 @@ h2 {
           </div>
           {% endif %}
   
-          {% if entry.workout %}
+          {% if entry.workouts|length > 0 %}
           <div class="workout-section">
             <div class="workout-header" onclick="toggleWorkout(this)">
-              <strong>Workout:</strong>
+              <strong>Workouts:</strong>
               <div class="workout-type">
-                {{ entry.workout.type }}
+                {% if entry.workouts|length > 1 %}
+                  {{ entry.workouts|length }} workouts
+                {% else %}
+                  {{ entry.workouts[0].type }}
+                {% endif %}
                 <span class="chevron">›</span>
               </div>
             </div>
             <div class="workout-content">    
-              <div class="exercise-list">
-                {% for exercise in entry.workout.exercises %}
-                <div class="exercise-item">
-                  {{ exercise.name }}: {{ exercise.weight }}lbs × {{ exercise.sets }}×{{ exercise.reps }}
+              {% for workout in entry.workouts %}
+              <div class="workout-item">
+                <h4>{{ workout.type }}</h4>
+                <div class="exercise-list">
+                  {% for exercise in workout.exercises %}
+                  <div class="exercise-item">
+                    {{ exercise.name }}: {{ exercise.weight if exercise.weight else 0 }}lbs × {{ exercise.sets if exercise.sets else 0 }}×{{ exercise.reps if exercise.reps else 0 }}
+                  </div>
+                  {% endfor %}
                 </div>
-                {% endfor %}
               </div>
+              {% endfor %}
             </div>
           </div>
           {% endif %}
         </div>
-      </div>
-      {% endfor %}
-    </div>
-</div>
+    {% endfor %}    
 
 <div id="editModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
     <div class="modal-content" style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
