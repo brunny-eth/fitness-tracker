@@ -4279,3 +4279,80 @@
 2024-12-27 09:40:59,898 INFO:  * Debugger PIN: 133-619-259
 2024-12-27 09:41:00,296 INFO: 127.0.0.1 - - [27/Dec/2024 09:41:00] "GET /history HTTP/1.1" 200 -
 2024-12-27 09:42:18,832 INFO: 127.0.0.1 - - [27/Dec/2024 09:42:18] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:44:05,644 INFO: 127.0.0.1 - - [27/Dec/2024 09:44:05] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:44:12,576 INFO: 127.0.0.1 - - [27/Dec/2024 09:44:12] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:44:58,145 INFO: 127.0.0.1 - - [27/Dec/2024 09:44:58] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:45:17,105 INFO: 127.0.0.1 - - [27/Dec/2024 09:45:17] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:45:38,185 INFO: 127.0.0.1 - - [27/Dec/2024 09:45:38] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:45:46,561 INFO: 127.0.0.1 - - [27/Dec/2024 09:45:46] "GET /settings HTTP/1.1" 200 -
+2024-12-27 09:45:47,745 INFO: 127.0.0.1 - - [27/Dec/2024 09:45:47] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:46:04,059 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:04] "GET /history HTTP/1.1" 200 -
+2024-12-27 09:46:18,305 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:18] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:46:21,745 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:21] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:46:24,964 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:24] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:46:27,093 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:27] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 09:46:28,216 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:28] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 09:46:35,049 INFO: 127.0.0.1 - - [27/Dec/2024 09:46:35] "GET /history HTTP/1.1" 200 -
+2024-12-27 12:34:30,727 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:30] "GET /history HTTP/1.1" 200 -
+2024-12-27 12:34:32,362 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:32] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 12:34:32,804 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:32] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:34:33,576 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:33] "GET /history HTTP/1.1" 200 -
+2024-12-27 12:34:34,050 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:34] "GET /settings HTTP/1.1" 200 -
+2024-12-27 12:34:34,648 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:34] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:34:35,086 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:35] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 12:34:36,806 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:36] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:34:37,207 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:37] "GET /history HTTP/1.1" 200 -
+2024-12-27 12:34:37,705 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:37] "GET /nutrition HTTP/1.1" 200 -
+2024-12-27 12:34:54,359 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:54] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:34:56,872 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:56] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:34:56,881 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:56] "GET /get_last_workout/High%20Intensity%20Interval%20Training HTTP/1.1" 200 -
+2024-12-27 12:34:56,886 INFO: 127.0.0.1 - - [27/Dec/2024 12:34:56] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:02,460 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:02] "GET /get_workout_category/5 HTTP/1.1" 200 -
+2024-12-27 12:35:04,918 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:04] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:04,926 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:04] "GET /get_last_workout/High%20Intensity%20Interval%20Training HTTP/1.1" 200 -
+2024-12-27 12:35:04,930 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:04] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:11,812 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:11] "POST /delete_workout/2 HTTP/1.1" 200 -
+2024-12-27 12:35:11,820 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:11] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:35:13,809 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:13] "GET /history HTTP/1.1" 200 -
+2024-12-27 12:35:32,775 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:32] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:35:51,551 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:51] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:51,564 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:51] "GET /get_last_workout/High%20Intensity%20Interval%20Training HTTP/1.1" 200 -
+2024-12-27 12:35:51,570 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:51] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:55,511 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:55] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:55,519 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:55] "[33mGET /get_last_workout/Upper%20Body HTTP/1.1[0m" 404 -
+2024-12-27 12:35:55,523 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:55] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:57,271 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:57] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:35:57,282 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:57] "GET /get_last_workout/High%20Intensity%20Interval%20Training HTTP/1.1" 200 -
+2024-12-27 12:35:57,286 INFO: 127.0.0.1 - - [27/Dec/2024 12:35:57] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:36:07,432 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:07] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:36:07,437 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:07] "[33mGET /get_last_workout/Abs HTTP/1.1[0m" 404 -
+2024-12-27 12:36:07,442 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:07] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:36:09,238 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:09] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:36:09,246 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:09] "GET /get_last_workout/High%20Intensity%20Interval%20Training HTTP/1.1" 200 -
+2024-12-27 12:36:09,249 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:09] "GET /get_workout_categories HTTP/1.1" 200 -
+2024-12-27 12:36:33,996 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:33] "GET /workouts HTTP/1.1" 200 -
+2024-12-27 12:36:35,338 INFO: 127.0.0.1 - - [27/Dec/2024 12:36:35] "GET /history HTTP/1.1" 200 -
+2024-12-27 12:40:24,154 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/conftest.py', reloading
+2024-12-27 12:40:24,279 INFO:  * Restarting with stat
+2024-12-27 12:40:24,784 INFO: Application startup
+2024-12-27 12:40:24,822 WARNING:  * Debugger is active!
+2024-12-27 12:40:24,829 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 12:40:28,891 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_auth.py', reloading
+2024-12-27 12:40:28,986 INFO:  * Restarting with stat
+2024-12-27 12:40:29,357 INFO: Application startup
+2024-12-27 12:40:29,389 WARNING:  * Debugger is active!
+2024-12-27 12:40:29,394 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 12:40:37,516 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_nutrition.py', reloading
+2024-12-27 12:40:37,654 INFO:  * Restarting with stat
+2024-12-27 12:40:38,028 INFO: Application startup
+2024-12-27 12:40:38,058 WARNING:  * Debugger is active!
+2024-12-27 12:40:38,063 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 12:40:43,156 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_workouts.py', reloading
+2024-12-27 12:40:43,279 INFO:  * Restarting with stat
+2024-12-27 12:40:43,639 INFO: Application startup
+2024-12-27 12:40:43,671 WARNING:  * Debugger is active!
+2024-12-27 12:40:43,675 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 12:43:42,722 INFO: Application startup
+2024-12-27 12:43:43,076 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 12:43:43,077 INFO: Successfully added nutrition entry
+2024-12-27 12:43:43,154 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
