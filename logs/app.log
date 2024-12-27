@@ -4356,3 +4356,80 @@
 2024-12-27 12:43:43,076 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
 2024-12-27 12:43:43,077 INFO: Successfully added nutrition entry
 2024-12-27 12:43:43,154 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:03:27,839 INFO: Application startup
+2024-12-27 14:03:28,210 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:03:28,211 INFO: Successfully added nutrition entry
+2024-12-27 14:03:28,288 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:03:33,490 INFO: Application startup
+2024-12-27 14:03:33,898 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:03:33,899 INFO: Successfully added nutrition entry
+2024-12-27 14:03:33,981 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:04:38,713 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:04:38,828 INFO:  * Restarting with stat
+2024-12-27 14:04:39,207 INFO: Application startup
+2024-12-27 14:04:39,246 WARNING:  * Debugger is active!
+2024-12-27 14:04:39,252 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:04:55,506 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_auth.py', reloading
+2024-12-27 14:04:55,599 INFO:  * Restarting with stat
+2024-12-27 14:04:55,949 INFO: Application startup
+2024-12-27 14:04:55,981 WARNING:  * Debugger is active!
+2024-12-27 14:04:55,986 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:05:11,193 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:05:11,312 INFO:  * Restarting with stat
+2024-12-27 14:05:11,687 INFO: Application startup
+2024-12-27 14:05:11,720 WARNING:  * Debugger is active!
+2024-12-27 14:05:11,725 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:05:12,745 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:05:12,830 INFO:  * Restarting with stat
+2024-12-27 14:05:13,202 INFO: Application startup
+2024-12-27 14:05:13,235 WARNING:  * Debugger is active!
+2024-12-27 14:05:13,240 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:05:25,464 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_workouts.py', reloading
+2024-12-27 14:05:25,581 INFO:  * Restarting with stat
+2024-12-27 14:05:25,955 INFO: Application startup
+2024-12-27 14:05:25,988 WARNING:  * Debugger is active!
+2024-12-27 14:05:25,992 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:05:33,196 INFO: Application startup
+2024-12-27 14:07:00,572 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:07:00,680 INFO:  * Restarting with stat
+2024-12-27 14:07:01,026 INFO: Application startup
+2024-12-27 14:07:01,057 WARNING:  * Debugger is active!
+2024-12-27 14:07:01,062 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:07:11,226 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:07:11,330 INFO:  * Restarting with stat
+2024-12-27 14:07:11,671 INFO: Application startup
+2024-12-27 14:07:11,701 WARNING:  * Debugger is active!
+2024-12-27 14:07:11,705 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:07:42,445 INFO: Application startup
+2024-12-27 14:07:42,771 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:07:42,772 INFO: Successfully added nutrition entry
+2024-12-27 14:07:42,850 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:08:07,562 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_workouts.py', reloading
+2024-12-27 14:08:07,652 INFO:  * Restarting with stat
+2024-12-27 14:08:08,043 INFO: Application startup
+2024-12-27 14:08:08,088 WARNING:  * Debugger is active!
+2024-12-27 14:08:08,093 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:08:18,264 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/templates/tests/test_auth.py', reloading
+2024-12-27 14:08:18,386 INFO:  * Restarting with stat
+2024-12-27 14:08:18,751 INFO: Application startup
+2024-12-27 14:08:18,783 WARNING:  * Debugger is active!
+2024-12-27 14:08:18,788 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:08:20,440 INFO: Application startup
+2024-12-27 14:09:03,080 INFO: Application startup
+2024-12-27 14:09:03,370 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:09:03,371 INFO: Successfully added nutrition entry
+2024-12-27 14:09:03,462 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}
+2024-12-27 14:10:09,536 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/app.py', reloading
+2024-12-27 14:10:09,635 INFO:  * Restarting with stat
+2024-12-27 14:10:10,008 INFO: Application startup
+2024-12-27 14:10:10,044 WARNING:  * Debugger is active!
+2024-12-27 14:10:10,049 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:10:26,300 INFO:  * Detected change in '/Users/blulinski/code/fitness-tracker/tests/test_auth.py', reloading
+2024-12-27 14:10:26,400 INFO:  * Restarting with stat
+2024-12-27 14:10:26,769 INFO: Application startup
+2024-12-27 14:10:26,801 WARNING:  * Debugger is active!
+2024-12-27 14:10:26,806 INFO:  * Debugger PIN: 133-619-259
+2024-12-27 14:10:31,588 INFO: Application startup
+2024-12-27 14:10:31,857 INFO: Received nutrition data: {'calorie_amount': 500, 'meal_name': 'Test Meal', 'protein_amount': 30}
+2024-12-27 14:10:31,858 INFO: Successfully added nutrition entry
+2024-12-27 14:10:31,936 INFO: Received nutrition data: {'calorie_amount': 500, 'protein_amount': -1}

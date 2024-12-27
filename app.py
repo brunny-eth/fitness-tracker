@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, UTC 
 import json
 import requests
 from anthropic import Anthropic
@@ -41,7 +41,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(UTC))
     
     settings = db.relationship('UserSettings', backref='user', uselist=False)
     saved_meals = db.relationship('SavedMeal', backref='user')
@@ -98,7 +98,7 @@ class NutritionEntry(db.Model):
 class Workout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.now(UTC))
     type = db.Column(db.String(50), nullable=False)
     exercises = db.Column(db.Text, nullable=False)
 
@@ -150,7 +150,7 @@ def calculate_calorie_target(current_weight_kg, settings):
             raise ValueError("Missing required settings")
             
         goal_date = settings.start_date + timedelta(days=settings.goal_months * 30.44)
-        days_remaining = (goal_date - datetime.utcnow()).days
+        days_remaining = (goal_date - datetime.now(UTC)).days
         
         if days_remaining <= 0:
             raise ValueError("Goal date has passed")
@@ -453,7 +453,10 @@ def log_workout():
     )
     db.session.add(new_workout)
     db.session.commit()
-    return jsonify({"message": "Workout logged successfully"}), 201
+    return jsonify({
+        "message": "Workout logged successfully",
+        "id": new_workout.id  # Add this line
+    }), 201
 
 @app.route('/add_weight', methods=['POST'])
 @login_required
@@ -688,6 +691,12 @@ def login():
 def register():
     if request.method == 'POST':
         try:
+            if User.query.filter_by(email=request.form.get('email')).first():
+                if request.content_type == 'application/json':
+                    return jsonify({"error": "Email already registered"}), 400
+                flash('Email already registered')  # Add this line
+                return render_template('register.html'), 400
+
             # Basic validation
             required_fields = [
                 'email', 'password', 'starting_weight', 'target_weight',
@@ -744,7 +753,7 @@ def register():
                 gender=gender,
                 height_inches=height_cm / 2.54,
                 protein_ratio=protein_ratio,
-                start_date=datetime.utcnow()
+                start_date=datetime.now(UTC)
             )
             
             # Calculate initial calories considering direction
@@ -812,7 +821,7 @@ def settings():
     if settings.start_date and settings.goal_months:
         start_date = settings.start_date
         goal_date = start_date + timedelta(days=settings.goal_months * 30.44)
-        days_remaining = (goal_date - datetime.utcnow()).days
+        days_remaining = (goal_date - datetime.now(UTC)).days
         months_remaining = round(days_remaining / 30.44, 1)
     
     weight_direction = determine_weight_direction(
@@ -838,7 +847,7 @@ def update_settings():
     
     try:
         if not settings.start_date:
-            settings.start_date = datetime.utcnow()
+            settings.start_date = datetime.now(UTC)
             
         # Update weight goals
         if data.get('target_weight'):
