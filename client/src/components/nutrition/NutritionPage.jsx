@@ -1,8 +1,8 @@
 // NutritionPage.jsx
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Card } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Button } from '../ui/button';
 
 const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieGoal }) => {
   const proteinProgress = (currentProtein / proteinGoal) * 100;
