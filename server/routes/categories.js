@@ -1,7 +1,7 @@
 import express from 'express';
 import Category from '../models/category.js';
 import Exercise from '../models/exercise.js';
-import auth from '../middleware/auth.js';
+import { auth } from '../middleware/auth.js'; 
 
 const router = express.Router();
 
