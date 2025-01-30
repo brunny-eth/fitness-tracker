@@ -1,7 +1,9 @@
 // server/services/mealAnalysis.js
-export async function analyzeMeal(description) {
+
+export const analyzeMeal = async (description) => {
   return {
-    protein: 0,
-    calories: 0
+    name: description.split('\n')[0] || 'Unknown Meal',
+    protein: Math.floor(Math.random() * 30) + 10, 
+    calories: Math.floor(Math.random() * 400) + 200, 
   };
-}
+};

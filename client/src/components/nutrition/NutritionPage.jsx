@@ -189,12 +189,12 @@ const SavedMealsList = ({ onSelectMeal }) => {
   );
 };
 
-const TodaysMeals = ({ meals, onDeleteMeal }) => {
+const TodaysMeals = ({ meals = [], onDeleteMeal }) => {  
   return (
     <Card className="p-4">
       <h3 className="text-lg font-semibold mb-4">Today's Meals</h3>
       <div className="space-y-3">
-        {meals.map((meal) => (
+        {Array.isArray(meals) && meals.map((meal) => (
           <div
             key={meal._id}
             className="flex justify-between items-center p-2 hover:bg-gray-50 rounded"
