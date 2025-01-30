@@ -31,12 +31,19 @@ const WorkoutCategories = ({ onSelectCategory }) => {
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/categories');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setCategories(data);
+      console.log('Categories response:', data); 
+      setCategories(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error('Failed to fetch categories:', error);
       setError('Failed to load categories');
+      setCategories([]); 
     }
   };
+  
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
@@ -44,7 +51,10 @@ const WorkoutCategories = ({ onSelectCategory }) => {
       const response = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newCategoryName }),
+        body: JSON.stringify({ 
+          name: newCategoryName,
+          userID: "65b9474e39d3a34e8fd3e372"
+        }),
       });
       
       if (!response.ok) throw new Error('Failed to create category');

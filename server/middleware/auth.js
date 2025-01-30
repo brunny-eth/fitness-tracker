@@ -1,5 +1,7 @@
-export const auth = async (req, res, next) => {
-  // Simple pass-through middleware
-  req.user = { _id: 'dummy-user-id' }; // Provide a dummy user ID for now
+export const auth = (req, res, next) => {
+  // Temporary development auth middleware
+  req.user = {
+    _id: '65b9474e39d3a34e8fd3e372'  
+  };
   next();
 };
