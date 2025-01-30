@@ -7,83 +7,146 @@ import SetLogger from './SetLogger';
 const WorkoutLogger = ({ category }) => {
   const [exercises, setExercises] = useState([]);
   const [currentExercise, setCurrentExercise] = useState(null);
+  const [error, setError] = useState(null);
+    const storageKey = `workout-${category._id}`;
   
+  // Load saved workout from localStorage
   useEffect(() => {
-    const savedWorkout = localStorage.getItem(`workout-${category}`);
-    if (savedWorkout) {
-      setExercises(JSON.parse(savedWorkout));
+    try {
+      const savedWorkout = localStorage.getItem(storageKey);
+      if (savedWorkout) {
+        const parsedWorkout = JSON.parse(savedWorkout);
+        setExercises(parsedWorkout);
+      } else {
+        setExercises([]); // Reset if no saved workout
+      }
+    } catch (error) {
+      console.error('Error loading saved workout:', error);
+      setError('Failed to load saved workout');
     }
-  }, [category]);
+  }, [category._id]);
 
+  // Save workout to localStorage whenever exercises change
   useEffect(() => {
-    if (exercises.length > 0) {
-      localStorage.setItem(`workout-${category}`, JSON.stringify(exercises));
+    try {
+      if (exercises.length > 0) {
+        localStorage.setItem(storageKey, JSON.stringify(exercises));
+      } else {
+        localStorage.removeItem(storageKey); // Clean up if no exercises
+      }
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      setError('Failed to save workout progress');
     }
-  }, [exercises, category]);
+  }, [exercises, storageKey]);
 
   const handleSelectExercise = (exercise) => {
-    setCurrentExercise(exercise);
+    // Check if exercise already exists in current workout
+    const existingExercise = exercises.find(e => e._id === exercise._id);
+    if (existingExercise) {
+      setCurrentExercise(existingExercise);
+    } else {
+      setCurrentExercise({
+        ...exercise,
+        sets: []
+      });
+    }
+    setError(null);
   };
 
   const handleSaveSet = (set) => {
-    const exerciseIndex = exercises.findIndex(e => e._id === currentExercise._id);
-    
-    if (exerciseIndex === -1) {
-      setExercises([
-        ...exercises,
-        {
+    setExercises(prevExercises => {
+      const exerciseIndex = prevExercises.findIndex(e => e._id === currentExercise._id);
+      
+      if (exerciseIndex === -1) {
+        // New exercise
+        return [...prevExercises, {
           ...currentExercise,
-          sets: [set]
-        }
-      ]);
-    } else {
-      const updatedExercises = [...exercises];
-      updatedExercises[exerciseIndex] = {
-        ...updatedExercises[exerciseIndex],
-        sets: [...updatedExercises[exerciseIndex].sets, set]
-      };
-      setExercises(updatedExercises);
-    }
+          sets: [set],
+          lastUpdated: new Date().toISOString()
+        }];
+      } else {
+        // Existing exercise
+        const updatedExercises = [...prevExercises];
+        updatedExercises[exerciseIndex] = {
+          ...updatedExercises[exerciseIndex],
+          sets: [...updatedExercises[exerciseIndex].sets, set],
+          lastUpdated: new Date().toISOString()
+        };
+        return updatedExercises;
+      }
+    });
   };
 
   const handleDeleteSet = (exerciseIndex, setIndex) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
-    
-    if (updatedExercises[exerciseIndex].sets.length === 0) {
-      updatedExercises.splice(exerciseIndex, 1);
-    }
-    
-    setExercises(updatedExercises);
+    setExercises(prevExercises => {
+      const updatedExercises = [...prevExercises];
+      const exercise = updatedExercises[exerciseIndex];
+      
+      // Remove the set
+      exercise.sets.splice(setIndex, 1);
+      
+      // If no sets left, remove the exercise
+      if (exercise.sets.length === 0) {
+        updatedExercises.splice(exerciseIndex, 1);
+        // Reset currentExercise if it was the deleted one
+        if (currentExercise?._id === exercise._id) {
+          setCurrentExercise(null);
+        }
+      } else {
+        exercise.lastUpdated = new Date().toISOString();
+      }
+      
+      return updatedExercises;
+    });
   };
 
   const handleCompleteWorkout = async () => {
     try {
       const response = await fetch('/api/workouts/log', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          // Add auth header here when implemented
+        },
         body: JSON.stringify({
-          category,
-          exercises,
-          date: new Date().toISOString()
+          categoryId: category._id,
+          exercises: exercises.map(exercise => ({
+            exerciseId: exercise._id,
+            name: exercise.name,
+            sets: exercise.sets
+          })),
+          completedAt: new Date().toISOString()
         }),
       });
 
-      if (response.ok) {
-        localStorage.removeItem(`workout-${category}`);
-        setExercises([]);
-        setCurrentExercise(null);
+      if (!response.ok) {
+        throw new Error('Failed to save workout');
       }
+
+      // Clear local storage and reset state
+      localStorage.removeItem(storageKey);
+      setExercises([]);
+      setCurrentExercise(null);
+      setError(null);
     } catch (error) {
-      console.error('Error saving workout:', error);
+      console.error('Error completing workout:', error);
+      setError('Failed to save workout. Please try again.');
     }
   };
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="p-4 bg-red-50 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+
       <ExerciseSelector 
         category={category}
         onSelectExercise={handleSelectExercise}
+        currentExercise={currentExercise}
       />
 
       {currentExercise && (
@@ -98,13 +161,19 @@ const WorkoutLogger = ({ category }) => {
           <h3 className="text-lg font-semibold mb-4">Workout Progress</h3>
           {exercises.map((exercise, exerciseIndex) => (
             <div key={exercise._id} className="mb-6">
-              <h4 className="font-medium mb-2">{exercise.name}</h4>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium">{exercise.name}</h4>
+                <span className="text-sm text-gray-500">
+                  {new Date(exercise.lastUpdated).toLocaleTimeString()}
+                </span>
+              </div>
               {exercise.sets.map((set, setIndex) => (
                 <div key={setIndex} className="flex items-center justify-between p-2 bg-gray-50 rounded mb-2">
                   <span>Set {setIndex + 1}: {set.weight}kg × {set.reps} reps</span>
                   <Button
                     onClick={() => handleDeleteSet(exerciseIndex, setIndex)}
-                    className="text-red-500"
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-700"
                   >
                     Delete
                   </Button>

@@ -1,10 +1,32 @@
 import mongoose from 'mongoose';
 
-const exerciseTemplateSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  category: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  isActive: { type: Boolean, default: true }
+const exerciseSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Category'
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+}, {
+  timestamps: true
 });
 
-export default mongoose.model('ExerciseTemplate', exerciseTemplateSchema);
+// Index for faster queries
+exerciseSchema.index({ categoryId: 1, userId: 1, isActive: 1 });
+
+const ExerciseTemplate = mongoose.model('Exercise', exerciseSchema);
+
+export default ExerciseTemplate;
