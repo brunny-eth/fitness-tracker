@@ -6,42 +6,144 @@ import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Add auth middleware to all routes
-router.post('/analyze', auth, async (req, res) => {
+router.post('/analyze', async (req, res) => {
   try {
-    const analysis = await analyzeMeal(req.body.description);
-    res.json(analysis);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const { description } = req.body;
+    if (!description) {
+      return res.status(400).json({ error: 'Meal description is required' });
+    }
 
-router.post('/log', auth, async (req, res) => {
-  try {
-    const meal = new Meal({
-      userId: req.user._id, 
-      ...req.body
-    });
-    await meal.save();
-    res.json(meal);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/log', auth, async (req, res) => {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const analysis = await analyzeMeal(description);
     
+    const simplifiedResponse = {
+      name: description.split('\n')[0] || 'Unknown Meal',
+      protein: analysis.total.protein,
+      calories: analysis.total.calories,
+      details: analysis.breakdown
+    };
+
+    res.json(simplifiedResponse);
+  } catch (error) {
+    console.error('Error analyzing meal:', error);
+    res.status(500).json({ error: 'Failed to analyze meal' });
+  }
+});
+
+// Get today's meal log
+router.get('/log', async (req, res) => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
     const meals = await Meal.find({
-      userId: req.user._id,
-      date: { $gte: today },
+      date: { $gte: startOfDay },
       isSaved: false
-    });
+    }).sort('date');
+
     res.json(meals);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error fetching meals:', error);
+    res.status(500).json({ error: 'Failed to fetch meals' });
+  }
+});
+
+// Log a new meal
+router.post('/log', async (req, res) => {
+  try {
+    const meal = new Meal({
+      name: req.body.name,
+      protein: req.body.protein,
+      calories: req.body.calories,
+      details: req.body.details
+    });
+
+    await meal.save();
+    res.status(201).json(meal);
+  } catch (error) {
+    console.error('Error logging meal:', error);
+    res.status(400).json({ error: 'Failed to log meal' });
+  }
+});
+
+// Delete a logged meal
+router.delete('/log/:id', async (req, res) => {
+  try {
+    await Meal.findByIdAndDelete(req.params.id);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting meal:', error);
+    res.status(500).json({ error: 'Failed to delete meal' });
+  }
+});
+
+// Get saved meals
+router.get('/saved-meals', async (req, res) => {
+  try {
+    const meals = await Meal.find({ isSaved: true }).sort('-date');
+    res.json(meals);
+  } catch (error) {
+    console.error('Error fetching saved meals:', error);
+    res.status(500).json({ error: 'Failed to fetch saved meals' });
+  }
+});
+
+// Save a meal for future use
+router.post('/save-meal', async (req, res) => {
+  try {
+    const meal = new Meal({
+      name: req.body.name,
+      protein: req.body.protein,
+      calories: req.body.calories,
+      details: req.body.details,
+      isSaved: true
+    });
+
+    await meal.save();
+    res.status(201).json(meal);
+  } catch (error) {
+    console.error('Error saving meal:', error);
+    res.status(400).json({ error: 'Failed to save meal' });
+  }
+});
+
+// Delete a saved meal
+router.delete('/saved-meal/:id', async (req, res) => {
+  try {
+    await Meal.findOneAndDelete({
+      _id: req.params.id,
+      isSaved: true
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting saved meal:', error);
+    res.status(500).json({ error: 'Failed to delete saved meal' });
+  }
+});
+
+// Get nutrition stats for today
+router.get('/stats', async (req, res) => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const meals = await Meal.find({
+      date: { $gte: startOfDay },
+      isSaved: false
+    });
+
+    const stats = meals.reduce((acc, meal) => ({
+      currentProtein: acc.currentProtein + meal.protein,
+      currentCalories: acc.currentCalories + meal.calories
+    }), { currentProtein: 0, currentCalories: 0 });
+
+    // Add the goals (these could come from user settings later)
+    stats.proteinGoal = 150;
+    stats.calorieGoal = 2000;
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching nutrition stats:', error);
+    res.status(500).json({ error: 'Failed to fetch nutrition stats' });
   }
 });
 

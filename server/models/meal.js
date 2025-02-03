@@ -1,4 +1,4 @@
-// server/models/Meal.js
+// server/models/meal.js
 import mongoose from 'mongoose';
 
 const mealSchema = new mongoose.Schema({
@@ -28,7 +28,13 @@ const mealSchema = new mongoose.Schema({
   isSaved: {
     type: Boolean,
     default: false
-  }
+  },
+  details: [{
+    item: String,
+    portion: String,
+    protein: Number,
+    calories: Number
+  }]
 }, {
   timestamps: true
 });
