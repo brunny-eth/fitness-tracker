@@ -1,20 +1,35 @@
 // server/services/mealAnalysis.js
 import Anthropic from '@anthropic-ai/sdk';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
+// Load .env file from server root
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+const apiKey = process.env.CLAUDE_API_KEY;  
+if (!apiKey) {
+  console.error('CLAUDE_API_KEY is not set in environment variables');
+}
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: apiKey
 });
 
 export const analyzeMeal = async (mealDescription) => {
-  console.log("Starting meal analysis");
-  console.log(`API Key present: ${Boolean(process.env.ANTHROPIC_API_KEY)}`);
+  const startTime = Date.now();
+  console.log("Starting meal analysis at:", new Date().toISOString());
+  console.log("Meal description:", mealDescription);
+  console.log(`API Key present: ${Boolean(apiKey)}`);
+  console.log("API Key first 4 chars:", apiKey?.slice(0, 4));
 
   try {
-    console.log("Sending request to Anthropic API");
+    console.log("Creating request to Anthropic API...");
     
+    const messageStart = Date.now();
     const message = await anthropic.messages.create({
       model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
@@ -49,16 +64,26 @@ export const analyzeMeal = async (mealDescription) => {
       }]
     });
 
-    console.log("Received response from Anthropic API");
+    const apiDuration = Date.now() - messageStart;
+    console.log("Received response from Anthropic API after", apiDuration, "ms");
+    console.log("Raw response:", message.content[0].text);
     
     const responseText = message.content[0].text;
     const parsedResponse = JSON.parse(responseText);
-    console.log("Successfully parsed JSON response");
+    
+    const totalDuration = Date.now() - startTime;
+    console.log("Total analysis duration:", totalDuration, "ms");
+    console.log("Parsed response:", JSON.stringify(parsedResponse, null, 2));
     
     return parsedResponse;
     
   } catch (error) {
     console.error("Error in analyzeMeal:", error);
+    console.error("Error details:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     throw new Error("Failed to analyze meal");
   }
 };

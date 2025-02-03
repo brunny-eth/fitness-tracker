@@ -1,22 +1,28 @@
 // server/routes/nutrition.js
 import express from 'express';
-import Meal from '../models/Meal.js';
 import { analyzeMeal } from '../services/mealAnalysis.js';
-import { auth } from '../middleware/auth.js';  
+import Meal from '../models/meal.js';
 
 const router = express.Router();
 
+// Analyze a meal description
 router.post('/analyze', async (req, res) => {
   try {
+    console.log('Received analyze request with body:', req.body);
+    
     const { description } = req.body;
     if (!description) {
+      console.log('No description provided');
       return res.status(400).json({ error: 'Meal description is required' });
     }
 
+    console.log('Analyzing meal:', description);
     const analysis = await analyzeMeal(description);
+    console.log('Analysis result:', analysis);
     
+    // Transform the detailed analysis into the format expected by the frontend
     const simplifiedResponse = {
-      name: description.split('\n')[0] || 'Unknown Meal',
+      name: description,
       protein: analysis.total.protein,
       calories: analysis.total.calories,
       details: analysis.breakdown
@@ -24,10 +30,11 @@ router.post('/analyze', async (req, res) => {
 
     res.json(simplifiedResponse);
   } catch (error) {
-    console.error('Error analyzing meal:', error);
-    res.status(500).json({ error: 'Failed to analyze meal' });
+    console.error('Error in /analyze endpoint:', error);
+    res.status(500).json({ error: error.message || 'Failed to analyze meal' });
   }
 });
+
 
 // Get today's meal log
 router.get('/log', async (req, res) => {
