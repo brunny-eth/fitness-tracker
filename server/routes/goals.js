@@ -6,9 +6,8 @@ const router = express.Router();
 // Get current goals
 router.get('/', async (req, res) => {
   try {
-    const goals = await Goals.findOne({ 
-      userId: req.user._id 
-    }).sort({ createdAt: -1 });
+    // Just get the most recent goals
+    const goals = await Goals.findOne().sort({ createdAt: -1 });
     
     if (!goals) {
       return res.status(404).json({ message: 'No goals found' });
@@ -24,8 +23,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const goals = new Goals({
-      userId: req.user._id,
-      weightGoal: req.body.weightGoal,
+      weightGoal: req.body.weightGoal || 'maintain',
       muscleGoal: req.body.muscleGoal,
       targetWeight: req.body.targetWeight,
       currentWeight: req.body.currentWeight,
@@ -46,9 +44,7 @@ router.post('/', async (req, res) => {
 // Update goals
 router.put('/', async (req, res) => {
   try {
-    const goals = await Goals.findOne({ 
-      userId: req.user._id 
-    }).sort({ createdAt: -1 });
+    const goals = await Goals.findOne().sort({ createdAt: -1 });
     
     if (!goals) {
       return res.status(404).json({ message: 'No goals found' });
@@ -67,10 +63,7 @@ router.put('/', async (req, res) => {
 // Get goals history
 router.get('/history', async (req, res) => {
   try {
-    const goals = await Goals.find({ 
-      userId: req.user._id 
-    }).sort({ createdAt: -1 });
-    
+    const goals = await Goals.find().sort({ createdAt: -1 });
     res.json(goals);
   } catch (error) {
     res.status(500).json({ message: error.message });

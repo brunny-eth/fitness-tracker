@@ -2,6 +2,8 @@
 import express from 'express';
 import { analyzeMeal } from '../services/mealAnalysis.js';
 import Meal from '../models/meal.js';
+import Goals from '../models/goals.js';
+import Weight from '../models/weight.js';
 
 const router = express.Router();
 
@@ -143,14 +145,58 @@ router.get('/stats', async (req, res) => {
       currentCalories: acc.currentCalories + meal.calories
     }), { currentProtein: 0, currentCalories: 0 });
 
-    // Add the goals (these could come from user settings later)
-    stats.proteinGoal = 150;
-    stats.calorieGoal = 2000;
+    // Get the latest goals
+    const currentGoals = await Goals.findOne().sort({ createdAt: -1 });
+    
+    if (currentGoals) {
+      stats.proteinGoal = currentGoals.proteinTarget;
+      stats.calorieGoal = currentGoals.calorieTarget;
+    } else {
+      // Fallback defaults if no goals are set
+      stats.proteinGoal = 150;
+      stats.calorieGoal = 2000;
+    }
 
     res.json(stats);
   } catch (error) {
     console.error('Error fetching nutrition stats:', error);
     res.status(500).json({ error: 'Failed to fetch nutrition stats' });
+  }
+});
+
+router.post('/weight', async (req, res) => {
+  try {
+    const { weight } = req.body;
+    
+    // Save the weight entry
+    const weightEntry = new Weight({ weight });
+    await weightEntry.save();
+
+    // Update the current weight in goals
+    const currentGoals = await Goals.findOne().sort({ createdAt: -1 });
+    if (currentGoals) {
+      currentGoals.currentWeight = weight;
+      // Recalculate nutrition targets with new weight
+      currentGoals.calculateNutritionTargets();
+      await currentGoals.save();
+    }
+
+    res.status(201).json(weightEntry);
+  } catch (error) {
+    console.error('Error logging weight:', error);
+    res.status(400).json({ error: 'Failed to log weight' });
+  }
+});
+
+// Get weight history
+router.get('/weight/history', async (req, res) => {
+  try {
+    const weights = await Weight.find()
+      .sort({ date: -1 })
+      .limit(30); // Last 30 entries
+    res.json(weights);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch weight history' });
   }
 });
 

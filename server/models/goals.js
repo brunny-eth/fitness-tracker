@@ -3,13 +3,14 @@ import mongoose from 'mongoose';
 const goalsSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    required: true,
-    ref: 'User'
+    ref: 'User',
+    // Making it optional
+    required: false
   },
   weightGoal: {
     type: String,
     enum: ['gain', 'lose', 'maintain'],
-    required: true
+    default: 'maintain'  // Adding default
   },
   muscleGoal: {
     type: String,
@@ -52,7 +53,7 @@ const goalsSchema = new mongoose.Schema({
       this.proteinTarget = Math.round(this.targetWeight * 1.8);
       
       // Base metabolic rate (BMR) using Mifflin-St Jeor Equation
-      // Note: This is simplified - in production we'd need age, height, and gender
+      // Note: This is simplified, but should work for a toy app
       const bmr = (10 * this.currentWeight) + 625;
       
       // Activity multiplier (moderate activity = 1.55)
