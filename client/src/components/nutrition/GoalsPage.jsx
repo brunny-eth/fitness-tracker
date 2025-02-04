@@ -41,13 +41,25 @@ const GoalsPage = () => {
 
   const updateCalculations = (currentGoals) => {
     const weightDiff = Math.abs(currentGoals.targetWeight - currentGoals.currentWeight);
+    
+    // If target weight equals current weight
+    if (weightDiff === 0) {
+      setCalculated({
+        duration: 0,
+        targetDate: 'maintain',
+        message: "Keep doing what you do! We'll help you track it."
+      });
+      return;
+    }
+
     const weeksNeeded = Math.ceil(weightDiff / currentGoals.weeklyGoal);
     const targetDate = new Date();
     targetDate.setDate(targetDate.getDate() + (weeksNeeded * 7));
 
     setCalculated({
       duration: weeksNeeded,
-      targetDate: targetDate.toISOString().split('T')[0]
+      targetDate: targetDate.toISOString().split('T')[0],
+      message: null
     });
   };
 
@@ -64,7 +76,7 @@ const GoalsPage = () => {
         },
         body: JSON.stringify({
           ...goals,
-          targetDate: calculated.targetDate
+          targetDate: calculated.targetDate === 'maintain' ? new Date().toISOString() : calculated.targetDate
         }),
       });
 
@@ -94,7 +106,10 @@ const GoalsPage = () => {
       <form onSubmit={handleSubmit}>
         <Card className="mb-6">
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Weight Goals</h2>
+            <h2 className="text-xl font-semibold mb-2">Weight Goals</h2>
+            <p className="text-gray-600 italic mb-4">
+              Here, you can set some reasonable weight change goals, and the pace you'd like to achieve them at.
+            </p>
             
             <div className="space-y-4">
               <div>
@@ -104,10 +119,14 @@ const GoalsPage = () => {
                 <input
                   type="number"
                   value={goals.currentWeight}
-                  onChange={(e) => setGoals({
-                    ...goals,
-                    currentWeight: parseFloat(e.target.value)
-                  })}
+                  onChange={(e) => {
+                    const newGoals = {
+                      ...goals,
+                      currentWeight: parseFloat(e.target.value)
+                    };
+                    setGoals(newGoals);
+                    updateCalculations(newGoals);
+                  }}
                   className="w-full p-2 border rounded"
                   required
                   step="0.1"
@@ -121,10 +140,14 @@ const GoalsPage = () => {
                 <input
                   type="number"
                   value={goals.targetWeight}
-                  onChange={(e) => setGoals({
-                    ...goals,
-                    targetWeight: parseFloat(e.target.value)
-                  })}
+                  onChange={(e) => {
+                    const newGoals = {
+                      ...goals,
+                      targetWeight: parseFloat(e.target.value)
+                    };
+                    setGoals(newGoals);
+                    updateCalculations(newGoals);
+                  }}
                   className="w-full p-2 border rounded"
                   required
                   step="0.1"
@@ -137,10 +160,14 @@ const GoalsPage = () => {
                 </label>
                 <select
                   value={goals.weeklyGoal}
-                  onChange={(e) => setGoals({
-                    ...goals,
-                    weeklyGoal: parseFloat(e.target.value)
-                  })}
+                  onChange={(e) => {
+                    const newGoals = {
+                      ...goals,
+                      weeklyGoal: parseFloat(e.target.value)
+                    };
+                    setGoals(newGoals);
+                    updateCalculations(newGoals);
+                  }}
                   className="w-full p-2 border rounded"
                 >
                   <option value="0.25">0.25 kg per week</option>
@@ -155,7 +182,10 @@ const GoalsPage = () => {
 
         <Card className="mb-6">
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Muscle Goals</h2>
+            <h2 className="text-xl font-semibold mb-2">Muscle Goals</h2>
+            <p className="text-gray-600 italic mb-4">
+              There's only 2 options — build muscle, or maintain muscle. Losing muscle is almost always a bad option!
+            </p>
             
             <div className="space-y-4">
               <div>
@@ -183,19 +213,27 @@ const GoalsPage = () => {
             <h2 className="text-xl font-semibold mb-4">Timeline</h2>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span>Estimated Duration:</span>
-                <span className="font-medium">
-                  {calculated.duration} weeks
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span>Target Date:</span>
-                <span className="font-medium">
-                  {new Date(calculated.targetDate).toLocaleDateString()}
-                </span>
-              </div>
+              {calculated.message ? (
+                <div className="text-gray-700">
+                  {calculated.message}
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span>Estimated Duration:</span>
+                    <span className="font-medium">
+                      {calculated.duration} weeks
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span>Target Date:</span>
+                    <span className="font-medium">
+                      {new Date(calculated.targetDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </Card>
