@@ -5,6 +5,7 @@ import cors from 'cors';
 import nutritionRoutes from './routes/nutrition.js';
 import exerciseRoutes from './routes/exercises.js';
 import categoriesRouter from './routes/categories.js';
+import historyRouter from './routes/history.js';
 import goalsRouter from './routes/goals.js';
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/goals', goalsRouter);
+app.use('/api/history', historyRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

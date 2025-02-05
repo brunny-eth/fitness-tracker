@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import NutritionPage from './components/nutrition/NutritionPage';
 import WorkoutPage from './pages/WorkoutPage';
 import GoalsPage from './components/nutrition/GoalsPage';
+import HistoryPage from './components/history/HistoryPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<NutritionPage />} />
           <Route path="/workouts" element={<WorkoutPage />} />
           <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/history" element={<HistoryPage />} />
         </Routes>
       </div>
     </BrowserRouter>
