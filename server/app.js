@@ -7,6 +7,7 @@ import exerciseRoutes from './routes/exercises.js';
 import categoriesRouter from './routes/categories.js';
 import historyRouter from './routes/history.js';
 import goalsRouter from './routes/goals.js';
+import workoutRoutes from './routes/workouts.js';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/exercises', exerciseRoutes);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/goals', goalsRouter);
 app.use('/api/history', historyRouter);
+app.use('/api/workouts', workoutRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
