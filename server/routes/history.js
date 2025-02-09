@@ -93,6 +93,9 @@ router.get('/stats', auth, async (req, res) => {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
+    // Sort dailyStats in reverse chronological order (newest first)
+    dailyStats.sort((a, b) => new Date(b.date) - new Date(a.date));
+
     res.json(dailyStats);
   } catch (error) {
     console.error('Error fetching history:', error);
