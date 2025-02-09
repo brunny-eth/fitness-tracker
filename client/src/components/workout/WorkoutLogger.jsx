@@ -6,6 +6,7 @@ import SetLogger from './SetLogger';
 
 const WorkoutLogger = ({ category }) => {
   const [exercises, setExercises] = useState([]);
+  const [isCompleting, setIsCompleting] = useState(false);
   const [currentExercise, setCurrentExercise] = useState(null);
   const [error, setError] = useState(null);
     const storageKey = `workout-${category._id}`;
@@ -103,11 +104,13 @@ const WorkoutLogger = ({ category }) => {
 
   const handleCompleteWorkout = async () => {
     try {
+      setIsCompleting(true);
+      setError(null);
+      
       const response = await fetch('/api/workouts/log', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          // Add auth header here when implemented
         },
         body: JSON.stringify({
           categoryId: category._id,
@@ -119,11 +122,11 @@ const WorkoutLogger = ({ category }) => {
           completedAt: new Date().toISOString()
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to save workout');
       }
-
+  
       // Clear local storage and reset state
       localStorage.removeItem(storageKey);
       setExercises([]);
@@ -132,6 +135,8 @@ const WorkoutLogger = ({ category }) => {
     } catch (error) {
       console.error('Error completing workout:', error);
       setError('Failed to save workout. Please try again.');
+    } finally {
+      setIsCompleting(false);
     }
   };
 
@@ -185,6 +190,7 @@ const WorkoutLogger = ({ category }) => {
           <Button 
             onClick={handleCompleteWorkout}
             className="w-full mt-4"
+            isLoading={isCompleting}
           >
             Complete Workout
           </Button>
