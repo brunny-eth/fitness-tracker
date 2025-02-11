@@ -12,8 +12,19 @@ import authRoutes from './routes/auth.js';
 
 const app = express();
 
+// Check for required environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET is not defined');
+  process.exit(1);
+}
+
+if (!process.env.MONGODB_URI) {
+  console.error('FATAL ERROR: MONGODB_URI is not defined');
+  process.exit(1);
+}
+
 // Middleware
-app.use(cors());  // Enable CORS
+app.use(cors());
 app.use(express.json());
 
 // Request logging middleware
@@ -28,13 +39,13 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
+app.use('/api/auth', authRoutes);  
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/goals', goalsRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/workouts', workoutRoutes);
-app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

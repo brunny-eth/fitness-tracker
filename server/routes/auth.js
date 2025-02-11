@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { auth } from '../middleware/auth.js';
 import User from '../models/user.js';
 
 const router = express.Router();
@@ -11,9 +12,13 @@ router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    // Simple validation
+    // Validation
     if (!username || !password) {
       return res.status(400).json({ message: 'All fields are required' });
+    }
+    
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
     
     // Check if user exists
@@ -44,6 +49,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -76,6 +82,23 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Verify token and get user data
+router.get('/verify', auth, async (req, res) => {
+  try {
+    // User is already attached to req by auth middleware
+    res.json({
+      user: {
+        id: req.user._id,
+        username: req.user.username
+      }
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { ArrowRight, Save, Undo } from 'lucide-react';
 
 const GoalsPage = () => {
+  const { user } = useAuth();
   const [goals, setGoals] = useState({
     weightGoal: 'maintain',
     muscleGoal: 'maintain',
@@ -23,17 +26,16 @@ const GoalsPage = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchCurrentGoals();
-  }, []);
+    if (user) {
+      fetchCurrentGoals();
+    }
+  }, [user]);
 
   const fetchCurrentGoals = async () => {
     try {
-      const response = await fetch('/api/goals');
-      if (response.ok) {
-        const data = await response.json();
-        setGoals(data);
-        updateCalculations(data);
-      }
+      const data = await api.get('/api/goals');
+      setGoals(data);
+      updateCalculations(data);
     } catch (err) {
       setError('Failed to load goals');
     }
@@ -42,7 +44,6 @@ const GoalsPage = () => {
   const updateCalculations = (currentGoals) => {
     const weightDiff = Math.abs(currentGoals.targetWeight - currentGoals.currentWeight);
     
-    // If target weight equals current weight
     if (weightDiff === 0) {
       setCalculated({
         duration: 0,
@@ -65,26 +66,19 @@ const GoalsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) return;
+    
     setLoading(true);
     setError('');
 
     try {
-      const response = await fetch('/api/goals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...goals,
-          targetDate: calculated.targetDate === 'maintain' ? new Date().toISOString() : calculated.targetDate
-        }),
+      const savedGoals = await api.post('/api/goals', {
+        ...goals,
+        targetDate: calculated.targetDate === 'maintain' 
+          ? new Date().toISOString() 
+          : calculated.targetDate
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save goals');
-      }
-
-      const savedGoals = await response.json();
+      
       setGoals(savedGoals);
     } catch (err) {
       setError(err.message);

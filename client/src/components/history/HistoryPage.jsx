@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -137,36 +139,37 @@ const DailyEntry = ({ entry }) => (
 );
 
 const HistoryPage = () => {
+  const { user } = useAuth();
   const [historyData, setHistoryData] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
-        // Fetch summary data
-        const summaryResponse = await fetch('/api/history/summary');
-        const summaryData = await summaryResponse.json();
-        setSummary(summaryData);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Fetch historical stats
-        const statsResponse = await fetch('/api/history/stats');
-        const statsData = await statsResponse.json();
-        setHistoryData(statsData);
-      } catch (err) {
-        console.error('Error fetching history:', err);
-        setError('Failed to load history data');
-      } finally {
-        setLoading(false);
-      }
-    };
+      // Fetch summary data
+      const summaryData = await api.get('/api/history/summary');
+      setSummary(summaryData);
 
-    fetchData();
-  }, []);
+      // Fetch historical stats
+      const statsData = await api.get('/api/history/stats');
+      setHistoryData(statsData);
+    } catch (err) {
+      console.error('Error fetching history:', err);
+      setError('Failed to load history data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return <div className="p-4">Loading...</div>;

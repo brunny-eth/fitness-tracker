@@ -1,13 +1,16 @@
+// server/routes/goals.js
 import express from 'express';
+import { auth } from '../middleware/auth.js';
 import Goals from '../models/goals.js';
 
 const router = express.Router();
 
 // Get current goals
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    // Just get the most recent goals
-    const goals = await Goals.findOne().sort({ createdAt: -1 });
+    const goals = await Goals.findOne({
+      userId: req.user._id
+    }).sort({ createdAt: -1 });
     
     if (!goals) {
       return res.status(404).json({ message: 'No goals found' });
@@ -20,9 +23,10 @@ router.get('/', async (req, res) => {
 });
 
 // Create new goals
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const goals = new Goals({
+      userId: req.user._id,
       weightGoal: req.body.weightGoal || 'maintain',
       muscleGoal: req.body.muscleGoal,
       targetWeight: req.body.targetWeight,
@@ -31,7 +35,6 @@ router.post('/', async (req, res) => {
       targetDate: req.body.targetDate
     });
 
-    // Calculate nutrition targets based on goals
     goals.calculateNutritionTargets();
     
     const savedGoals = await goals.save();
@@ -42,9 +45,11 @@ router.post('/', async (req, res) => {
 });
 
 // Update goals
-router.put('/', async (req, res) => {
+router.put('/', auth, async (req, res) => {
   try {
-    const goals = await Goals.findOne().sort({ createdAt: -1 });
+    const goals = await Goals.findOne({
+      userId: req.user._id
+    }).sort({ createdAt: -1 });
     
     if (!goals) {
       return res.status(404).json({ message: 'No goals found' });
@@ -61,9 +66,11 @@ router.put('/', async (req, res) => {
 });
 
 // Get goals history
-router.get('/history', async (req, res) => {
+router.get('/history', auth, async (req, res) => {
   try {
-    const goals = await Goals.find().sort({ createdAt: -1 });
+    const goals = await Goals.find({
+      userId: req.user._id
+    }).sort({ createdAt: -1 });
     res.json(goals);
   } catch (error) {
     res.status(500).json({ message: error.message });
