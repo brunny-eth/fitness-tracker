@@ -1,31 +1,66 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import ExerciseSelector from './ExerciseSelector';
 import SetLogger from './SetLogger';
 
 const WorkoutLogger = ({ category }) => {
+  const { user } = useAuth();
   const [exercises, setExercises] = useState([]);
   const [isCompleting, setIsCompleting] = useState(false);
   const [currentExercise, setCurrentExercise] = useState(null);
   const [error, setError] = useState(null);
-    const storageKey = `workout-${category._id}`;
+  const storageKey = `workout-${category._id}`;
   
   // Load saved workout from localStorage
   useEffect(() => {
-    try {
-      const savedWorkout = localStorage.getItem(storageKey);
-      if (savedWorkout) {
-        const parsedWorkout = JSON.parse(savedWorkout);
-        setExercises(parsedWorkout);
-      } else {
-        setExercises([]); // Reset if no saved workout
+    if (user) {  
+      try {
+        const savedWorkout = localStorage.getItem(storageKey);
+        if (savedWorkout) {
+          const parsedWorkout = JSON.parse(savedWorkout);
+          setExercises(parsedWorkout);
+        } else {
+          setExercises([]);
+        }
+      } catch (error) {
+        console.error('Error loading saved workout:', error);
+        setError('Failed to load saved workout');
       }
-    } catch (error) {
-      console.error('Error loading saved workout:', error);
-      setError('Failed to load saved workout');
     }
-  }, [category._id]);
+  }, [category._id, user]);
+
+  const handleCompleteWorkout = async () => {
+    if (!user) return;
+
+    try {
+      setIsCompleting(true);
+      setError(null);
+      
+      await api.post('/api/workouts/log', {
+        categoryId: category._id,
+        exercises: exercises.map(exercise => ({
+          exerciseId: exercise._id,
+          name: exercise.name,
+          sets: exercise.sets
+        })),
+        completedAt: new Date().toISOString()
+      });
+  
+      // Clear local storage and reset state
+      localStorage.removeItem(storageKey);
+      setExercises([]);
+      setCurrentExercise(null);
+      setError(null);
+    } catch (error) {
+      console.error('Error completing workout:', error);
+      setError('Failed to save workout. Please try again.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   // Save workout to localStorage whenever exercises change
   useEffect(() => {
@@ -100,44 +135,6 @@ const WorkoutLogger = ({ category }) => {
       
       return updatedExercises;
     });
-  };
-
-  const handleCompleteWorkout = async () => {
-    try {
-      setIsCompleting(true);
-      setError(null);
-      
-      const response = await fetch('/api/workouts/log', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          categoryId: category._id,
-          exercises: exercises.map(exercise => ({
-            exerciseId: exercise._id,
-            name: exercise.name,
-            sets: exercise.sets
-          })),
-          completedAt: new Date().toISOString()
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to save workout');
-      }
-  
-      // Clear local storage and reset state
-      localStorage.removeItem(storageKey);
-      setExercises([]);
-      setCurrentExercise(null);
-      setError(null);
-    } catch (error) {
-      console.error('Error completing workout:', error);
-      setError('Failed to save workout. Please try again.');
-    } finally {
-      setIsCompleting(false);
-    }
   };
 
   return (

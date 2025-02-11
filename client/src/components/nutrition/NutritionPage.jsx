@@ -1,5 +1,7 @@
 // NutritionPage.jsx
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
@@ -87,15 +89,15 @@ const WeightInput = ({ onSave }) => {
 const MealEntry = ({ onAddMeal, onSaveMeal }) => {
   const [mealDescription, setMealDescription] = useState('');
   const [analysisResult, setAnalysisResult] = useState(null);
+  const { user } = useAuth();
 
   const handleAnalyze = async () => {
+    if (!user) return;
+    
     try {
-      const response = await fetch('/api/nutrition/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: mealDescription }),
+      const data = await api.post('/api/nutrition/analyze', { 
+        description: mealDescription 
       });
-      const data = await response.json();
       setAnalysisResult(data);
     } catch (error) {
       console.error('Error analyzing meal:', error);
@@ -155,20 +157,22 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
 
 const SavedMealsList = ({ onSelectMeal }) => {
   const [savedMeals, setSavedMeals] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchSavedMeals = async () => {
       try {
-        const response = await fetch('/api/nutrition/saved-meals');
-        const data = await response.json();
+        const data = await api.get('/api/nutrition/saved-meals');
         setSavedMeals(data);
       } catch (error) {
         console.error('Error fetching saved meals:', error);
       }
     };
 
-    fetchSavedMeals();
-  }, []);
+    if (user) {
+      fetchSavedMeals();
+    }
+  }, [user]);
 
   return (
     <div className="space-y-2">
@@ -219,7 +223,9 @@ const TodaysMeals = ({ meals = [], onDeleteMeal }) => {
   );
 };
 
+
 const NutritionPage = () => {
+  const { user } = useAuth();
   const [todaysMeals, setTodaysMeals] = useState([]);
   const [stats, setStats] = useState({
     currentProtein: 0,
@@ -229,13 +235,10 @@ const NutritionPage = () => {
   });
 
   const handleAddMeal = async (meal) => {
+    if (!user) return;
+    
     try {
-      const response = await fetch('/api/nutrition/log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(meal),
-      });
-      const newMeal = await response.json();
+      const newMeal = await api.post('/api/nutrition/log', meal);
       setTodaysMeals([...todaysMeals, newMeal]);
       updateStats();
     } catch (error) {
@@ -244,8 +247,10 @@ const NutritionPage = () => {
   };
 
   const handleDeleteMeal = async (mealId) => {
+    if (!user) return;
+    
     try {
-      await fetch(`/api/nutrition/log/${mealId}`, { method: 'DELETE' });
+      await api.delete(`/api/nutrition/log/${mealId}`);
       setTodaysMeals(todaysMeals.filter((meal) => meal._id !== mealId));
       updateStats();
     } catch (error) {
@@ -254,9 +259,10 @@ const NutritionPage = () => {
   };
 
   const updateStats = async () => {
+    if (!user) return;
+    
     try {
-      const response = await fetch('/api/nutrition/stats');
-      const data = await response.json();
+      const data = await api.get('/api/nutrition/stats');
       setStats(data);
     } catch (error) {
       console.error('Error updating stats:', error);
@@ -266,38 +272,37 @@ const NutritionPage = () => {
   useEffect(() => {
     const fetchTodaysMeals = async () => {
       try {
-        const response = await fetch('/api/nutrition/log');
-        const data = await response.json();
+        const data = await api.get('/api/nutrition/log');
         setTodaysMeals(data);
       } catch (error) {
         console.error('Error fetching meals:', error);
       }
     };
 
-    fetchTodaysMeals();
-    updateStats();
-  }, []);
+    if (user) {
+      fetchTodaysMeals();
+      updateStats();
+    }
+  }, [user]);
 
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Nutrition Tracking</h1>
       <NutritionStats {...stats} />
       <WeightInput onSave={async (weight) => {
-        await fetch('/api/progress/weight', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ weight }),
-        });
+        if (!user) return;
+        try {
+          await api.post('/api/progress/weight', { weight });
+        } catch (error) {
+          console.error('Error saving weight:', error);
+        }
       }} />
       <MealEntry
         onAddMeal={handleAddMeal}
         onSaveMeal={async (meal) => {
+          if (!user) return;
           try {
-            await fetch('/api/nutrition/save-meal', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(meal),
-            });
+            await api.post('/api/nutrition/save-meal', meal);
           } catch (error) {
             console.error('Error saving meal:', error);
           }

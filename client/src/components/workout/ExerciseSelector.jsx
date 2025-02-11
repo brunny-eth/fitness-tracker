@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 
 const ExerciseSelector = ({ category, onSelectExercise, currentExercise }) => {
+  const { user } = useAuth();
   const [exercises, setExercises] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newExercise, setNewExercise] = useState('');
@@ -10,24 +13,16 @@ const ExerciseSelector = ({ category, onSelectExercise, currentExercise }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (category?._id) {
+    if (category?._id && user) {
       fetchExercises();
     }
-  }, [category?._id]);
+  }, [category?._id, user]);
 
   const fetchExercises = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch(`/api/exercises?categoryId=${category._id}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch exercises');
-      }
-      
-      const data = await response.json();
-      console.log('Fetched exercises:', data);
+      const data = await api.get(`/api/exercises?categoryId=${category._id}`);
       setExercises(data);
     } catch (error) {
       console.error('Error fetching exercises:', error);
@@ -41,27 +36,11 @@ const ExerciseSelector = ({ category, onSelectExercise, currentExercise }) => {
     e.preventDefault();
     try {
       setError(null);
-      console.log('Attempting to create exercise:', {
+      const data = await api.post('/api/exercises', {
         name: newExercise.trim(),
         categoryId: category._id
       });
-
-      const response = await fetch('/api/exercises', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name: newExercise.trim(), 
-          categoryId: category._id 
-        }),
-      });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create exercise');
-      }
-      
-      const data = await response.json();
-      console.log('Created exercise:', data);
       setExercises([...exercises, data]);
       setNewExercise('');
       setShowAddForm(false);
