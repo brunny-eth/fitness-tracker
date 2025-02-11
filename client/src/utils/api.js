@@ -8,16 +8,33 @@ const getAuthHeaders = () => {
     };
   };
   
+  const handleResponse = async (response) => {
+    if (response.status === 401) {
+      // Clear auth data and reload to trigger login redirect
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.reload();
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Request failed');
+    }
+    
+    if (response.status === 204) {
+      return null;
+    }
+    
+    return response.json();
+  };
+  
   export const api = {
     get: async (url) => {
       const response = await fetch(url, {
         headers: getAuthHeaders()
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
-      }
-      return response.json();
+      return handleResponse(response);
     },
   
     post: async (url, data) => {
@@ -26,11 +43,7 @@ const getAuthHeaders = () => {
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
-      }
-      return response.json();
+      return handleResponse(response);
     },
   
     put: async (url, data) => {
@@ -39,11 +52,7 @@ const getAuthHeaders = () => {
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
-      }
-      return response.json();
+      return handleResponse(response);
     },
   
     delete: async (url) => {
@@ -51,10 +60,6 @@ const getAuthHeaders = () => {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      if (!response.ok && response.status !== 204) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
-      }
-      return response;
+      return handleResponse(response);
     }
   };
