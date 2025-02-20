@@ -48,15 +48,13 @@ const goalsSchema = new mongoose.Schema({
 }, {
   timestamps: true,
   methods: {
-    calculateNutritionTargets() {
-      // Protein target: 1.8g per kg of target weight
-      this.proteinTarget = Math.round(this.targetWeight * 1.8);
+    calculateNutritionTargets() {     
+      // Adjust protein target based on muscle goals (1.2-2.0g per kg)
+      const proteinMultiplier = this.muscleGoal === 'gain' ? 2.0 : 1.2;
+      this.proteinTarget = Math.round(this.targetWeight * proteinMultiplier);
       
-      // Base metabolic rate (BMR) using Mifflin-St Jeor Equation
-      // Note: This is simplified, but should work for a toy app
+      // Base metabolic rate (BMR) calculation remains the same
       const bmr = (10 * this.currentWeight) + 625;
-      
-      // Activity multiplier (moderate activity = 1.55)
       const maintenance = bmr * 1.55;
       
       // Adjust calories based on goal

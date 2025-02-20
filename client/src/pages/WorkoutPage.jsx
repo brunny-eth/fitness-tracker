@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import WorkoutLogger from '../components/workout/WorkoutLogger';
+import { api } from '../utils/api';
 
 const WorkoutStats = () => {
   return (
@@ -70,7 +71,6 @@ const WorkoutCategories = ({ onSelectCategory }) => {
     }
   };
   
-
   return (
     <Card className="p-4 mb-6">
       <div className="flex justify-between items-center mb-4">

@@ -1,6 +1,7 @@
 import express from 'express';
 import Category from '../models/category.js';
 import { auth } from '../middleware/auth.js';
+import ExerciseTemplate from '../models/exercise.js';
 
 const router = express.Router();
 
@@ -10,7 +11,19 @@ router.get('/', auth, async (req, res) => {
       .find({ userId: req.user._id })
       .sort({ name: 1 });
     
-    res.json(categories);
+    const categoriesWithCounts = await Promise.all(categories.map(async (category) => {
+      const count = await ExerciseTemplate.countDocuments({
+        categoryId: category._id,
+        userId: req.user._id,
+        isActive: true
+      });
+      
+      const categoryObj = category.toObject();
+      categoryObj.exerciseCount = count;
+      return categoryObj;
+    }));
+    
+    res.json(categoriesWithCounts);
   } catch (error) {
     console.error('Category fetch error:', error); 
     res.status(500).json({ message: 'Error fetching categories' });

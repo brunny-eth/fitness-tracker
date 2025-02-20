@@ -6,6 +6,8 @@ import { Card } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
 
+const [isAnalyzing, setIsAnalyzing] = useState(false);
+
 const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieGoal }) => {
   const proteinProgress = (currentProtein / proteinGoal) * 100;
   const calorieProgress = (currentCalories / calorieGoal) * 100;
@@ -106,13 +108,25 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
 
   return (
     <Card className="p-4 mb-6">
-      <Tabs defaultValue="ai">
-        <TabsList>
-          <TabsTrigger value="ai">Ask AI</TabsTrigger>
-          <TabsTrigger value="saved">Saved Meals</TabsTrigger>
-        </TabsList>
+  <Tabs defaultValue="ai">
+      <TabsList>
+        <TabsTrigger 
+          value="ai" 
+          onClick={() => setActiveTab('ai')}
+          className={activeTab === 'ai' ? 'bg-background text-foreground shadow-sm' : ''}
+        >
+          Ask AI
+        </TabsTrigger>
+        <TabsTrigger 
+          value="saved" 
+          onClick={() => setActiveTab('saved')}
+          className={activeTab === 'saved' ? 'bg-background text-foreground shadow-sm' : ''}
+        >
+          Saved Meals
+        </TabsTrigger>
+      </TabsList>
 
-        <TabsContent value="ai">
+      <TabsContent value="ai" className={activeTab === 'ai' ? '' : 'hidden'}>
           <div className="space-y-4">
             <textarea
               value={mealDescription}
@@ -147,7 +161,8 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="saved">
+
+        <TabsContent value="saved" className={activeTab === 'saved' ? '' : 'hidden'}>
           <SavedMealsList onSelectMeal={onAddMeal} />
         </TabsContent>
       </Tabs>
@@ -182,7 +197,7 @@ const SavedMealsList = ({ onSelectMeal }) => {
             <div>
               <h4 className="font-medium">{meal.name}</h4>
               <p className="text-sm text-gray-500">
-                {meal.protein}g protein • {meal.calories} calories
+              {meal.protein}g protein | {meal.calories} cal
               </p>
             </div>
             <Button onClick={() => onSelectMeal(meal)}>Add</Button>
@@ -206,7 +221,7 @@ const TodaysMeals = ({ meals = [], onDeleteMeal }) => {
             <div>
               <h4 className="font-medium">{meal.name}</h4>
               <p className="text-sm text-gray-500">
-                {meal.protein}g protein • {meal.calories} calories
+              {meal.protein}g protein | {meal.calories} cal
               </p>
             </div>
             <Button
@@ -233,6 +248,8 @@ const NutritionPage = () => {
     currentCalories: 0,
     calorieGoal: 2000,
   });
+  
+  const [activeTab, setActiveTab] = useState('ai');
 
   const handleAddMeal = async (meal) => {
     if (!user) return;
