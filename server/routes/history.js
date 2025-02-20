@@ -5,15 +5,34 @@ import Meal from '../models/meal.js';
 import Workout from '../models/workout.js';
 import Weight from '../models/weight.js';
 import Goals from '../models/goals.js';
+import User from '../models/user.js';
 
 const router = express.Router();
+
+const getDateString = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 // Get historical data for a date range (default last 30 days)
 router.get('/stats', auth, async (req, res) => {
   try {
     const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 30);
+    
+    // Get user info to check creation date
+    const user = await User.findById(req.user._id);
+    
+    // Use either user creation date or 30 days ago, whichever is more recent
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const startDate = user.createdAt > thirtyDaysAgo ? 
+      new Date(user.createdAt) : thirtyDaysAgo;
+    
+    // Helper function for date string conversion
+    const getDateString = (date) => date.toISOString().split('T')[0];
 
     // Get all meals in date range
     const meals = await Meal.find({
@@ -34,21 +53,30 @@ router.get('/stats', auth, async (req, res) => {
     }).sort('date');
 
     // Get the goals that were active during this period
-    const goals = await Goals.find({
+    const allGoals = await Goals.find({
       userId: req.user._id,
       createdAt: { $lte: endDate }
-    }).sort('-createdAt');
+    }).sort('createdAt').lean();
+
+    const findApplicableGoals = (dateStr) => {
+      // Find the most recent goals that were created before or on this date
+      const applicableGoals = allGoals
+        .filter(g => getDateString(new Date(g.createdAt)) <= dateStr)
+        .pop();
+      
+      return applicableGoals || allGoals[0]; 
+    };
 
     // Aggregate data by day
     const dailyStats = [];
     let currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = getDateString(currentDate);
       
       // Find meals for this day
       const dayMeals = meals.filter(meal => 
-        meal.date.toISOString().split('T')[0] === dateStr
+        getDateString(meal.date) === dateStr
       );
 
       // Calculate daily totals
@@ -56,19 +84,17 @@ router.get('/stats', auth, async (req, res) => {
       const dailyCalories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
 
       // Find workouts for this day
-      const dayWorkouts = workouts.filter(workout =>
-        workout.date.toISOString().split('T')[0] === dateStr
+      const dayWorkouts = workouts.filter(workout => 
+        getDateString(new Date(workout.date)) === dateStr
       );
 
       // Find weight entry for this day
       const weightEntry = weights.find(w => 
-        w.date.toISOString().split('T')[0] === dateStr
+        getDateString(w.date) === dateStr
       );
 
       // Find applicable goals for this day
-      const applicableGoals = goals.find(g => 
-        g.createdAt.toISOString().split('T')[0] <= dateStr
-      ) || goals[0]; // Use most recent goals if none found
+      const applicableGoals = findApplicableGoals(dateStr);
 
       dailyStats.push({
         date: dateStr,

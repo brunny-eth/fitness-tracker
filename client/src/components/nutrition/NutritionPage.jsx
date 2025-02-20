@@ -290,21 +290,38 @@ const NutritionPage = () => {
       <h1 className="text-2xl font-bold mb-6">Nutrition Tracking</h1>
       <NutritionStats {...stats} />
       <WeightInput onSave={async (weight) => {
-        if (!user) return;
-        try {
-          await api.post('/api/progress/weight', { weight });
-        } catch (error) {
-          console.error('Error saving weight:', error);
-        }
-      }} />
+          if (!user) return;
+          try {
+            await api.post('/api/nutrition/weight', { weight });
+            alert('Weight saved successfully!');
+            updateStats();
+          } catch (error) {
+            console.error('Error saving weight:', error);
+            alert('Failed to save weight: ' + error.message);
+          }
+        }} />
       <MealEntry
         onAddMeal={handleAddMeal}
         onSaveMeal={async (meal) => {
           if (!user) return;
           try {
-            await api.post('/api/nutrition/save-meal', meal);
+            await api.post('/api/nutrition/save-meal', {
+              name: meal.name,
+              protein: meal.protein,
+              calories: meal.calories,
+              details: meal.details || []
+            });
+            
+            // Clear the analysis result
+            setMealDescription('');
+            setAnalysisResult(null);
+            
+            // Provide feedback
+            alert('Meal saved for future use!');
+          
           } catch (error) {
             console.error('Error saving meal:', error);
+            alert('Failed to save meal: ' + error.message);
           }
         }}
       />

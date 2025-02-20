@@ -30,17 +30,14 @@ const WorkoutCategories = ({ onSelectCategory }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('Categories response:', data); 
+      setError(null);
+      const data = await api.get('/api/categories');
+      console.log('Categories response:', data);
       setCategories(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
-      setError('Failed to load categories');
-      setCategories([]); 
+      setError('Failed to load categories: ' + error.message);
+      setCategories([]);
     }
   };
   
@@ -48,36 +45,31 @@ const WorkoutCategories = ({ onSelectCategory }) => {
   const handleAddCategory = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name: newCategoryName,
-          userID: "65b9474e39d3a34e8fd3e372"
-        }),
+      setError(null);
+      const newCategory = await api.post('/api/categories', { 
+        name: newCategoryName 
       });
       
-      if (!response.ok) throw new Error('Failed to create category');
-      
-      const newCategory = await response.json();
       setCategories([...categories, newCategory]);
       setNewCategoryName('');
       setIsAddingCategory(false);
     } catch (error) {
-      setError('Failed to create category');
+      console.error('Failed to create category:', error);
+      setError('Failed to create category: ' + error.message);
     }
   };
 
   const handleDeleteCategory = async (categoryId) => {
     try {
-      await fetch(`/api/categories/${categoryId}`, {
-        method: 'DELETE',
-      });
+      setError(null);
+      await api.delete(`/api/categories/${categoryId}`);
       setCategories(categories.filter(cat => cat._id !== categoryId));
     } catch (error) {
-      setError('Failed to delete category');
+      console.error('Failed to delete category:', error);
+      setError('Failed to delete category: ' + error.message);
     }
   };
+  
 
   return (
     <Card className="p-4 mb-6">
