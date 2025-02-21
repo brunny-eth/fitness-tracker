@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import { Card } from '../ui/card';
@@ -14,7 +15,7 @@ const WorkoutLogger = ({ category }) => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const storageKey = `workout-${category._id}`;
-  const navigate = useNavigate(); // Add this using react-router-dom
+  const navigate = useNavigate();
   
   // Load saved workout from localStorage
   useEffect(() => {
@@ -70,19 +71,6 @@ const WorkoutLogger = ({ category }) => {
     } catch (error) {
       console.error('Error completing workout:', error);
       setError('Failed to save workout: ' + (error.message || 'Please try again.'));
-    } finally {
-      setIsCompleting(false);
-    }
-  };
-  
-      // Clear local storage and reset state
-      localStorage.removeItem(storageKey);
-      setExercises([]);
-      setCurrentExercise(null);
-      setError(null);
-    } catch (error) {
-      console.error('Error completing workout:', error);
-      setError('Failed to save workout. Please try again.');
     } finally {
       setIsCompleting(false);
     }
@@ -168,6 +156,12 @@ const WorkoutLogger = ({ category }) => {
       {error && (
         <div className="p-4 bg-red-50 text-red-700 rounded-md">
           {error}
+        </div>
+      )}
+      
+      {successMessage && (
+        <div className="p-4 bg-green-50 text-green-700 rounded-md">
+          {successMessage}
         </div>
       )}
 
