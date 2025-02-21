@@ -5,6 +5,8 @@ import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieGoal }) => {
   const proteinProgress = (currentProtein / proteinGoal) * 100;
@@ -62,16 +64,13 @@ const WeightInput = ({ onSave }) => {
     <Card className="p-4 mb-6">
       <form onSubmit={handleSubmit} className="flex gap-4 items-center">
         <div className="flex-1">
-          <label htmlFor="weight" className="block text-sm font-medium mb-1">
-            Today's Weight (kg)
-          </label>
-          <input
+          <Label htmlFor="weight">Today's Weight (kg)</Label>
+          <Input
             type="number"
             id="weight"
             step="0.1"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            className="w-full p-2 border rounded"
             placeholder="Enter weight"
           />
         </div>
@@ -112,81 +111,58 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
 
   return (
     <Card className="p-4 mb-6">
-      <div className="mb-4">
-        <div className="flex border-b">
-          <button
-            className={`px-4 py-2 font-medium ${
-              activeTab === 'ai'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-600 hover:text-blue-500'
-            }`}
-            onClick={() => setActiveTab('ai')}
-          >
-            Ask AI
-          </button>
-          <button
-            className={`px-4 py-2 font-medium ${
-              activeTab === 'saved'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-600 hover:text-blue-500'
-            }`}
-            onClick={() => setActiveTab('saved')}
-          >
-            Saved Meals
-          </button>
-        </div>
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="ai">Ask AI</TabsTrigger>
+          <TabsTrigger value="saved">Saved Meals</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="ai">
+          <div className="space-y-4 mt-4">
+            <Label htmlFor="mealDescription">Describe your meal</Label>
+            <textarea
+              id="mealDescription"
+              value={mealDescription}
+              onChange={(e) => setMealDescription(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Describe your meal..."
+              rows={3}
+            />
+            <Button 
+              onClick={handleAnalyze} 
+              className="w-full" 
+              isLoading={isAnalyzing}
+              disabled={!mealDescription.trim()}
+            >
+              Analyze Meal
+            </Button>
 
-      {activeTab === 'ai' ? (
-        <div className="space-y-4">
-          <textarea
-            value={mealDescription}
-            onChange={(e) => setMealDescription(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Describe your meal..."
-            rows={3}
-          />
-          <Button 
-            onClick={handleAnalyze} 
-            className="w-full" 
-            disabled={isAnalyzing || !mealDescription.trim()}
-          >
-            {isAnalyzing ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Analyzing...
-              </>
-            ) : (
-              'Analyze Meal'
+            {analysisResult && (
+              <div className="mt-4 space-y-4">
+                <div className="flex justify-between">
+                  <span>Protein: {analysisResult.protein}g</span>
+                  <span>Calories: {analysisResult.calories}</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={() => onAddMeal(analysisResult)}>
+                    Add to Today
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => onSaveMeal(analysisResult)}
+                  >
+                    Save for Later
+                  </Button>
+                </div>
+              </div>
             )}
-          </Button>
-
-          {analysisResult && (
-            <div className="mt-4 space-y-4">
-              <div className="flex justify-between">
-                <span>Protein: {analysisResult.protein}g</span>
-                <span>Calories: {analysisResult.calories}</span>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={() => onAddMeal(analysisResult)}>
-                  Add to Today
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => onSaveMeal(analysisResult)}
-                >
-                  Save for Later
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <SavedMealsList onSelectMeal={onAddMeal} />
-      )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="saved">
+          <SavedMealsList onSelectMeal={onAddMeal} />
+        </TabsContent>
+      </Tabs>
     </Card>
   );
 };
@@ -237,7 +213,7 @@ const SavedMealsList = ({ onSelectMeal }) => {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 mt-4">
       {savedMeals.map((meal) => (
         <Card key={meal._id} className="p-3 hover:bg-gray-50">
           <div className="flex justify-between items-center">
@@ -250,8 +226,7 @@ const SavedMealsList = ({ onSelectMeal }) => {
             <div className="flex gap-2">
               <Button onClick={() => onSelectMeal(meal)}>Add</Button>
               <Button 
-                variant="outline" 
-                className="text-red-500 hover:bg-red-50"
+                variant="destructive" 
                 onClick={(e) => handleDeleteMeal(meal._id, e)}
                 disabled={isDeleting}
               >
@@ -270,28 +245,35 @@ const TodaysMeals = ({ meals = [], onDeleteMeal }) => {
   return (
     <Card className="p-4">
       <h3 className="text-lg font-semibold mb-4">Today's Meals</h3>
-      <div className="space-y-3">
-        {Array.isArray(meals) && meals.map((meal) => (
-          <div
-            key={meal._id}
-            className="flex justify-between items-center p-2 hover:bg-gray-50 rounded"
-          >
-            <div>
-              <h4 className="font-medium">{meal.name}</h4>
-              <p className="text-sm text-gray-500">
-                {meal.protein}g protein | {meal.calories} cal
-              </p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDeleteMeal(meal._id)}
+      {meals.length === 0 ? (
+        <p className="text-center text-gray-500 py-4">
+          No meals logged today. Use the AI to analyze and add meals.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {Array.isArray(meals) && meals.map((meal) => (
+            <div
+              key={meal._id}
+              className="flex justify-between items-center p-2 hover:bg-gray-50 rounded"
             >
-              ✕
-            </Button>
-          </div>
-        ))}
-      </div>
+              <div>
+                <h4 className="font-medium">{meal.name}</h4>
+                <p className="text-sm text-gray-500">
+                  {meal.protein}g protein | {meal.calories} cal
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDeleteMeal(meal._id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                ✕
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 };

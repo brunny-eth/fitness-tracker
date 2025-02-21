@@ -1,8 +1,11 @@
+// File: client/src/components/nutrition/GoalsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 import { ArrowRight, Save, Undo } from 'lucide-react';
 
 const GoalsPage = () => {
@@ -107,10 +110,9 @@ const GoalsPage = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Current Weight (kg)
-                </label>
-                <input
+                <Label htmlFor="currentWeight">Current Weight (kg)</Label>
+                <Input
+                  id="currentWeight"
                   type="number"
                   value={goals.currentWeight}
                   onChange={(e) => {
@@ -121,17 +123,15 @@ const GoalsPage = () => {
                     setGoals(newGoals);
                     updateCalculations(newGoals);
                   }}
-                  className="w-full p-2 border rounded"
                   required
                   step="0.1"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Target Weight (kg)
-                </label>
-                <input
+                <Label htmlFor="targetWeight">Target Weight (kg)</Label>
+                <Input
+                  id="targetWeight"
                   type="number"
                   value={goals.targetWeight}
                   onChange={(e) => {
@@ -142,17 +142,15 @@ const GoalsPage = () => {
                     setGoals(newGoals);
                     updateCalculations(newGoals);
                   }}
-                  className="w-full p-2 border rounded"
                   required
                   step="0.1"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Weekly Goal (kg)
-                </label>
+                <Label htmlFor="weeklyGoal">Weekly Goal (kg)</Label>
                 <select
+                  id="weeklyGoal"
                   value={goals.weeklyGoal}
                   onChange={(e) => {
                     const newGoals = {
@@ -162,7 +160,7 @@ const GoalsPage = () => {
                     setGoals(newGoals);
                     updateCalculations(newGoals);
                   }}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="0.25">0.25 kg per week</option>
                   <option value="0.5">0.5 kg per week</option>
@@ -183,16 +181,15 @@ const GoalsPage = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Muscle Goal
-                </label>
+                <Label htmlFor="muscleGoal">Muscle Goal</Label>
                 <select
+                  id="muscleGoal"
                   value={goals.muscleGoal}
                   onChange={(e) => setGoals({
                     ...goals,
                     muscleGoal: e.target.value
                   })}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="maintain">Maintain Muscle</option>
                   <option value="gain">Build Muscle</option>
@@ -246,6 +243,7 @@ const GoalsPage = () => {
           <Button
             type="submit"
             disabled={loading}
+            isLoading={loading}
           >
             <Save className="w-4 h-4 mr-2" />
             Save Goals

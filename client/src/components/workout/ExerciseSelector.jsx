@@ -1,8 +1,11 @@
+// File: client/src/components/workout/ExerciseSelector.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 const ExerciseSelector = ({ category, onSelectExercise, currentExercise }) => {
   const { user } = useAuth();
@@ -59,7 +62,8 @@ const ExerciseSelector = ({ category, onSelectExercise, currentExercise }) => {
             setShowAddForm(!showAddForm);
             setError(null); // Clear any existing errors
           }}
-          variant="outline"
+          variant={showAddForm ? "outline" : "default"}
+          size="sm"
         >
           {showAddForm ? 'Cancel' : 'Add New'}
         </Button>
@@ -73,14 +77,17 @@ const ExerciseSelector = ({ category, onSelectExercise, currentExercise }) => {
 
       {showAddForm && (
         <form onSubmit={handleAddExercise} className="mb-4">
-          <input
-            type="text"
-            value={newExercise}
-            onChange={(e) => setNewExercise(e.target.value)}
-            className="w-full p-2 border rounded mb-2"
-            placeholder="Exercise name"
-            required
-          />
+          <div className="mb-2">
+            <Label htmlFor="exerciseName">Exercise Name</Label>
+            <Input
+              id="exerciseName"
+              type="text"
+              value={newExercise}
+              onChange={(e) => setNewExercise(e.target.value)}
+              placeholder="Exercise name"
+              required
+            />
+          </div>
           <Button 
             type="submit"
             disabled={!newExercise.trim()}
