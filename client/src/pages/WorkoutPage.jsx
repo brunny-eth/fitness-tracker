@@ -5,15 +5,98 @@ import WorkoutLogger from '../components/workout/WorkoutLogger';
 import { api } from '../utils/api';
 
 const WorkoutStats = () => {
+  const [todayStatus, setTodayStatus] = useState({ completed: false, workout: null });
+  const [lastWorkout, setLastWorkout] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchWorkoutStats = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        
+        // Get workout history
+        const workouts = await api.get('/api/workouts/history');
+        
+        // Check if we have a workout today
+        const today = new Date().toISOString().split('T')[0];
+        const todayWorkout = workouts.find(workout => 
+          new Date(workout.date).toISOString().split('T')[0] === today
+        );
+        
+        if (todayWorkout) {
+          setTodayStatus({
+            completed: true,
+            workout: todayWorkout
+          });
+        }
+        
+        // Find the most recent workout that's not today
+        const recentWorkouts = workouts.filter(workout => 
+          new Date(workout.date).toISOString().split('T')[0] !== today
+        );
+        
+        if (recentWorkouts.length > 0) {
+          setLastWorkout(recentWorkouts[0]); // First one is the most recent
+        }
+      } catch (error) {
+        console.error('Error fetching workout stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchWorkoutStats();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <Card className="p-4">
+          <h3 className="text-lg font-semibold">Today's Status</h3>
+          <p className="text-gray-600">Loading...</p>
+        </Card>
+        <Card className="p-4">
+          <h3 className="text-lg font-semibold">Last Workout</h3>
+          <p className="text-gray-600">Loading...</p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
       <Card className="p-4">
         <h3 className="text-lg font-semibold">Today's Status</h3>
-        <p className="text-gray-600">No workout logged yet</p>
+        {todayStatus.completed ? (
+          <>
+            <p className="text-green-600 font-medium">Workout completed</p>
+            <p className="text-gray-600">{todayStatus.workout.category}</p>
+            <p className="text-gray-600 text-sm">
+              {todayStatus.workout.exercises.length} exercises
+            </p>
+          </>
+        ) : (
+          <p className="text-gray-600">No workout logged yet today</p>
+        )}
       </Card>
+      
       <Card className="p-4">
         <h3 className="text-lg font-semibold">Last Workout</h3>
-        <p className="text-gray-600">2 days ago - Push day</p>
+        {lastWorkout ? (
+          <>
+            <p className="text-gray-600 font-medium">
+              {new Date(lastWorkout.date).toLocaleDateString()} - {lastWorkout.category}
+            </p>
+            <p className="text-gray-600 text-sm">
+              {lastWorkout.exercises.length} exercises
+            </p>
+          </>
+        ) : (
+          <p className="text-gray-600">No previous workouts found</p>
+        )}
       </Card>
     </div>
   );
@@ -24,6 +107,7 @@ const WorkoutCategories = ({ onSelectCategory }) => {
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCategories();
@@ -31,17 +115,43 @@ const WorkoutCategories = ({ onSelectCategory }) => {
 
   const fetchCategories = async () => {
     try {
+      setLoading(true);
       setError(null);
+      
       const data = await api.get('/api/categories');
-      console.log('Categories response:', data);
-      setCategories(Array.isArray(data) ? data : []);
+      
+      // Make sure we have an array of categories
+      const categoryArray = Array.isArray(data) ? data : [];
+      
+      // Add exercise count for each category if it doesn't exist
+      const categoriesWithCounts = await Promise.all(categoryArray.map(async (category) => {
+        if (category.exerciseCount === undefined) {
+          // If exerciseCount is not populated, get exercises for this category
+          try {
+            const exercises = await api.get(`/api/exercises?categoryId=${category._id}`);
+            return {
+              ...category,
+              exerciseCount: Array.isArray(exercises) ? exercises.length : 0
+            };
+          } catch (err) {
+            console.error(`Error fetching exercises for category ${category._id}:`, err);
+            return {
+              ...category,
+              exerciseCount: 0
+            };
+          }
+        }
+        return category;
+      }));
+      
+      setCategories(categoriesWithCounts);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
-      setError('Failed to load categories: ' + error.message);
-      setCategories([]);
+      setError('Failed to load categories: ' + (error.message || 'Unknown error'));
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   const handleAddCategory = async (e) => {
     e.preventDefault();

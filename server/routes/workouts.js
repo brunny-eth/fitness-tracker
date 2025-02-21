@@ -21,25 +21,34 @@ router.post('/log', auth, async (req, res) => {
       return res.status(404).json({ error: 'Category not found' });
     }
 
-    // Create workout
+    // Create workout with properly formatted exercises
+    const formattedExercises = exercises.map(exercise => ({
+      name: exercise.name,
+      sets: Array.isArray(exercise.sets) ? exercise.sets : [],
+      notes: exercise.notes || ''
+    }));
+
     const workout = new Workout({
       userId: req.user._id,
       category: category.name,
-      exercises: exercises,
+      exercises: formattedExercises,
       date: completedAt || new Date()
     });
 
-    await workout.save();
+    const savedWorkout = await workout.save();
 
     // Update category's lastCompletedAt
     await Category.findByIdAndUpdate(categoryId, {
       lastCompletedAt: completedAt || new Date()
     });
 
-    res.status(201).json(workout);
+    res.status(201).json(savedWorkout);
   } catch (error) {
     console.error('Error logging workout:', error);
-    res.status(500).json({ error: 'Failed to log workout' });
+    res.status(500).json({ 
+      error: 'Failed to log workout',
+      details: error.message
+    });
   }
 });
 

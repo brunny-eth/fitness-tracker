@@ -16,7 +16,6 @@ const getDateString = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Get historical data for a date range (default last 30 days)
 router.get('/stats', auth, async (req, res) => {
   try {
     const endDate = new Date();
@@ -31,8 +30,11 @@ router.get('/stats', auth, async (req, res) => {
     const startDate = user.createdAt > thirtyDaysAgo ? 
       new Date(user.createdAt) : thirtyDaysAgo;
     
-    // Helper function for date string conversion
-    const getDateString = (date) => date.toISOString().split('T')[0];
+    // Helper function for consistent date string conversion
+    const getDateString = (date) => {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0];
+    };
 
     // Get all meals in date range
     const meals = await Meal.find({
@@ -56,16 +58,7 @@ router.get('/stats', auth, async (req, res) => {
     const allGoals = await Goals.find({
       userId: req.user._id,
       createdAt: { $lte: endDate }
-    }).sort('createdAt').lean();
-
-    const findApplicableGoals = (dateStr) => {
-      // Find the most recent goals that were created before or on this date
-      const applicableGoals = allGoals
-        .filter(g => getDateString(new Date(g.createdAt)) <= dateStr)
-        .pop();
-      
-      return applicableGoals || allGoals[0]; 
-    };
+    }).sort('createdAt');
 
     // Aggregate data by day
     const dailyStats = [];
@@ -74,10 +67,23 @@ router.get('/stats', auth, async (req, res) => {
     while (currentDate <= endDate) {
       const dateStr = getDateString(currentDate);
       
-      // Find meals for this day
-      const dayMeals = meals.filter(meal => 
-        getDateString(meal.date) === dateStr
-      );
+      // Find goals that apply to this date
+      let applicableGoals = null;
+      for (let i = allGoals.length - 1; i >= 0; i--) {
+        if (getDateString(allGoals[i].createdAt) <= dateStr) {
+          applicableGoals = allGoals[i];
+          break;
+        }
+      }
+      // Use the earliest goals if no applicable goals were found
+      if (!applicableGoals && allGoals.length > 0) {
+        applicableGoals = allGoals[0];
+      }
+
+      // Find meals for this day - ensure date comparison is done properly
+      const dayMeals = meals.filter(meal => {
+        return getDateString(meal.date) === dateStr;
+      });
 
       // Calculate daily totals
       const dailyProtein = dayMeals.reduce((sum, meal) => sum + meal.protein, 0);
@@ -85,16 +91,13 @@ router.get('/stats', auth, async (req, res) => {
 
       // Find workouts for this day
       const dayWorkouts = workouts.filter(workout => 
-        getDateString(new Date(workout.date)) === dateStr
+        getDateString(workout.date) === dateStr
       );
 
       // Find weight entry for this day
       const weightEntry = weights.find(w => 
         getDateString(w.date) === dateStr
       );
-
-      // Find applicable goals for this day
-      const applicableGoals = findApplicableGoals(dateStr);
 
       dailyStats.push({
         date: dateStr,
@@ -118,9 +121,6 @@ router.get('/stats', auth, async (req, res) => {
       // Move to next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
-
-    // Sort dailyStats in reverse chronological order (newest first)
-    dailyStats.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.json(dailyStats);
   } catch (error) {

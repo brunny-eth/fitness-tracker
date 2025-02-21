@@ -12,7 +12,9 @@ const WorkoutLogger = ({ category }) => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [currentExercise, setCurrentExercise] = useState(null);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const storageKey = `workout-${category._id}`;
+  const navigate = useNavigate(); // Add this using react-router-dom
   
   // Load saved workout from localStorage
   useEffect(() => {
@@ -30,24 +32,48 @@ const WorkoutLogger = ({ category }) => {
         setError('Failed to load saved workout');
       }
     }
-  }, [category._id, user]);
+  }, [category._id, user, storageKey]);
 
   const handleCompleteWorkout = async () => {
-    if (!user) return;
+    if (!user || exercises.length === 0) return;
 
     try {
       setIsCompleting(true);
       setError(null);
+      setSuccessMessage(null);
       
+      // Format the exercises data properly for the API
+      const formattedExercises = exercises.map(exercise => ({
+        exerciseId: exercise._id,
+        name: exercise.name,
+        sets: exercise.sets || []
+      }));
+      
+      // Send to API
       await api.post('/api/workouts/log', {
         categoryId: category._id,
-        exercises: exercises.map(exercise => ({
-          exerciseId: exercise._id,
-          name: exercise.name,
-          sets: exercise.sets
-        })),
+        exercises: formattedExercises,
         completedAt: new Date().toISOString()
       });
+  
+      // Clear local storage and reset state
+      localStorage.removeItem(storageKey);
+      setExercises([]);
+      setCurrentExercise(null);
+      setSuccessMessage('Workout completed successfully!');
+      
+      // After a short delay, navigate back to the workout list
+      setTimeout(() => {
+        navigate('/workouts');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error completing workout:', error);
+      setError('Failed to save workout: ' + (error.message || 'Please try again.'));
+    } finally {
+      setIsCompleting(false);
+    }
+  };
   
       // Clear local storage and reset state
       localStorage.removeItem(storageKey);

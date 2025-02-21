@@ -35,16 +35,37 @@ const ProgressChart = ({ data }) => (
     <h3 className="text-lg font-semibold mb-4">Progress Tracking</h3>
     <div className="h-96">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <LineChart 
+          data={data} 
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
           <XAxis 
             dataKey="date" 
-            tickFormatter={str => new Date(str).toLocaleDateString()} 
+            tickFormatter={str => {
+              const date = new Date(str);
+              return `${date.getMonth() + 1}/${date.getDate()}`;
+            }}
+            tick={{ fontSize: 12 }}
           />
-          <YAxis yAxisId="weight" orientation="right" />
-          <YAxis yAxisId="nutrition" orientation="left" />
+          {/* Separate Y axis for weight */}
+          <YAxis 
+            yAxisId="weight" 
+            orientation="right" 
+            domain={['dataMin - 5', 'dataMax + 5']}
+            label={{ value: 'Weight (kg)', angle: 90, position: 'insideRight' }}
+          />
+          {/* Separate Y axis for nutrition */}
+          <YAxis 
+            yAxisId="nutrition" 
+            orientation="left"
+            domain={[0, 'dataMax + 20']}
+            label={{ value: 'Protein/Calories', angle: -90, position: 'insideLeft' }}
+          />
           <Tooltip 
             labelFormatter={value => new Date(value).toLocaleDateString()}
             formatter={(value, name) => {
+              if (!value && value !== 0) return ['N/A', name];
+              
               switch (name) {
                 case 'weight':
                   return [`${value} kg`, 'Weight'];
@@ -57,28 +78,34 @@ const ProgressChart = ({ data }) => (
               }
             }}
           />
+          <Legend />
           <Line 
             yAxisId="weight"
             type="monotone" 
             dataKey="weight" 
             stroke="#8884d8" 
-            dot={false} 
+            strokeWidth={2}
+            dot={{ r: 3 }}
+            name="Weight"
           />
           <Line 
             yAxisId="nutrition"
             type="monotone" 
             dataKey="nutrition.protein" 
-            name="protein"
+            name="Protein"
             stroke="#82ca9d" 
-            dot={false} 
+            strokeWidth={2}
+            dot={{ r: 3 }}
           />
           <Line 
             yAxisId="nutrition"
             type="monotone" 
             dataKey="nutrition.calories" 
-            name="calories"
+            name="Calories"
             stroke="#ffc658" 
-            dot={false} 
+            stroke={Theme.warning}
+            strokeWidth={2}
+            dot={{ r: 3 }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -104,20 +131,30 @@ const DailyEntry = ({ entry }) => (
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <span>Protein</span>
-          <span className={entry.nutrition.protein >= entry.nutrition.proteinGoal ? 'text-green-600' : ''}>
+          <span className={
+            entry.nutrition.protein >= entry.nutrition.proteinGoal 
+              ? 'text-green-600 font-semibold' 
+              : ''
+          }>
             {entry.nutrition.protein}g / {entry.nutrition.proteinGoal}g
           </span>
         </div>
         <div className="flex justify-between items-center">
           <span>Calories</span>
-          <span className={entry.nutrition.calories <= entry.nutrition.calorieGoal ? 'text-green-600' : 'text-red-600'}>
+          <span className={
+            entry.nutrition.calories <= entry.nutrition.calorieGoal 
+              ? 'text-green-600 font-semibold' 
+              : entry.nutrition.calories > 0 
+                ? 'text-red-600 font-semibold'
+                : ''
+          }>
             {entry.nutrition.calories} / {entry.nutrition.calorieGoal}
           </span>
         </div>
       </div>
 
-      {/* Workouts */}
-      {entry.workouts.length > 0 && (
+      {/* Workouts - Only show if there are workouts */}
+      {entry.workouts && entry.workouts.length > 0 && (
         <div>
           <h4 className="font-medium mb-2">Workouts</h4>
           {entry.workouts.map((workout, i) => (
@@ -162,10 +199,16 @@ const HistoryPage = () => {
 
       // Fetch historical stats
       const statsData = await api.get('/api/history/stats');
-      setHistoryData(statsData);
+      
+      // Ensure data is sorted chronologically for the chart
+      const sortedData = [...statsData].sort((a, b) => 
+        new Date(a.date) - new Date(b.date)
+      );
+      
+      setHistoryData(sortedData);
     } catch (err) {
       console.error('Error fetching history:', err);
-      setError('Failed to load history data');
+      setError('Failed to load history data: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
