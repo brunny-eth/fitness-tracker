@@ -6,8 +6,6 @@ import { Card } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
 
-const [isAnalyzing, setIsAnalyzing] = useState(false);
-
 const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieGoal }) => {
   const proteinProgress = (currentProtein / proteinGoal) * 100;
   const calorieProgress = (currentCalories / calorieGoal) * 100;
@@ -91,103 +89,152 @@ const WeightInput = ({ onSave }) => {
 const MealEntry = ({ onAddMeal, onSaveMeal }) => {
   const [mealDescription, setMealDescription] = useState('');
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [activeTab, setActiveTab] = useState('ai');
   const { user } = useAuth();
 
   const handleAnalyze = async () => {
-    if (!user) return;
+    if (!user || !mealDescription.trim()) return;
     
     try {
+      setIsAnalyzing(true);
       const data = await api.post('/api/nutrition/analyze', { 
         description: mealDescription 
       });
       setAnalysisResult(data);
     } catch (error) {
       console.error('Error analyzing meal:', error);
+      alert('Failed to analyze meal: ' + error.message);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
   return (
     <Card className="p-4 mb-6">
-  <Tabs defaultValue="ai">
-      <TabsList>
-        <TabsTrigger 
-          value="ai" 
-          onClick={() => setActiveTab('ai')}
-          className={activeTab === 'ai' ? 'bg-background text-foreground shadow-sm' : ''}
-        >
-          Ask AI
-        </TabsTrigger>
-        <TabsTrigger 
-          value="saved" 
-          onClick={() => setActiveTab('saved')}
-          className={activeTab === 'saved' ? 'bg-background text-foreground shadow-sm' : ''}
-        >
-          Saved Meals
-        </TabsTrigger>
-      </TabsList>
+      <div className="mb-4">
+        <div className="flex border-b">
+          <button
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'ai'
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-600 hover:text-blue-500'
+            }`}
+            onClick={() => setActiveTab('ai')}
+          >
+            Ask AI
+          </button>
+          <button
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'saved'
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-600 hover:text-blue-500'
+            }`}
+            onClick={() => setActiveTab('saved')}
+          >
+            Saved Meals
+          </button>
+        </div>
+      </div>
 
-      <TabsContent value="ai" className={activeTab === 'ai' ? '' : 'hidden'}>
-          <div className="space-y-4">
-            <textarea
-              value={mealDescription}
-              onChange={(e) => setMealDescription(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="Describe your meal..."
-              rows={3}
-            />
-            <Button onClick={handleAnalyze} className="w-full">
-              Analyze Meal
-            </Button>
-
-            {analysisResult && (
-              <div className="mt-4 space-y-4">
-                <div className="flex justify-between">
-                  <span>Protein: {analysisResult.protein}g</span>
-                  <span>Calories: {analysisResult.calories}</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={() => onAddMeal(analysisResult)}>
-                    Add to Today
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => onSaveMeal(analysisResult)}
-                  >
-                    Save for Later
-                  </Button>
-                </div>
-              </div>
+      {activeTab === 'ai' ? (
+        <div className="space-y-4">
+          <textarea
+            value={mealDescription}
+            onChange={(e) => setMealDescription(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Describe your meal..."
+            rows={3}
+          />
+          <Button 
+            onClick={handleAnalyze} 
+            className="w-full" 
+            disabled={isAnalyzing || !mealDescription.trim()}
+          >
+            {isAnalyzing ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Analyzing...
+              </>
+            ) : (
+              'Analyze Meal'
             )}
-          </div>
-        </TabsContent>
+          </Button>
 
-
-        <TabsContent value="saved" className={activeTab === 'saved' ? '' : 'hidden'}>
-          <SavedMealsList onSelectMeal={onAddMeal} />
-        </TabsContent>
-      </Tabs>
+          {analysisResult && (
+            <div className="mt-4 space-y-4">
+              <div className="flex justify-between">
+                <span>Protein: {analysisResult.protein}g</span>
+                <span>Calories: {analysisResult.calories}</span>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => onAddMeal(analysisResult)}>
+                  Add to Today
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => onSaveMeal(analysisResult)}
+                >
+                  Save for Later
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <SavedMealsList onSelectMeal={onAddMeal} />
+      )}
     </Card>
   );
 };
 
 const SavedMealsList = ({ onSelectMeal }) => {
   const [savedMeals, setSavedMeals] = useState([]);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchSavedMeals = async () => {
-      try {
-        const data = await api.get('/api/nutrition/saved-meals');
-        setSavedMeals(data);
-      } catch (error) {
-        console.error('Error fetching saved meals:', error);
-      }
-    };
-
-    if (user) {
-      fetchSavedMeals();
-    }
+    fetchSavedMeals();
   }, [user]);
+
+  const fetchSavedMeals = async () => {
+    if (!user) return;
+    
+    try {
+      const data = await api.get('/api/nutrition/saved-meals');
+      setSavedMeals(data);
+    } catch (error) {
+      console.error('Error fetching saved meals:', error);
+    }
+  };
+
+  const handleDeleteMeal = async (mealId, e) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    if (!user || isDeleting) return;
+    
+    try {
+      setIsDeleting(true);
+      await api.delete(`/api/nutrition/saved-meal/${mealId}`);
+      setSavedMeals(savedMeals.filter(meal => meal._id !== mealId));
+      alert('Meal deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting saved meal:', error);
+      alert('Failed to delete meal: ' + error.message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (savedMeals.length === 0) {
+    return (
+      <div className="text-center py-4 text-gray-500">
+        No saved meals found. Use "Ask AI" to analyze and save meals.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
@@ -197,16 +244,27 @@ const SavedMealsList = ({ onSelectMeal }) => {
             <div>
               <h4 className="font-medium">{meal.name}</h4>
               <p className="text-sm text-gray-500">
-              {meal.protein}g protein | {meal.calories} cal
+                {meal.protein}g protein | {meal.calories} cal
               </p>
             </div>
-            <Button onClick={() => onSelectMeal(meal)}>Add</Button>
+            <div className="flex gap-2">
+              <Button onClick={() => onSelectMeal(meal)}>Add</Button>
+              <Button 
+                variant="outline" 
+                className="text-red-500 hover:bg-red-50"
+                onClick={(e) => handleDeleteMeal(meal._id, e)}
+                disabled={isDeleting}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </Card>
       ))}
     </div>
   );
 };
+
 
 const TodaysMeals = ({ meals = [], onDeleteMeal }) => {  
   return (
@@ -221,7 +279,7 @@ const TodaysMeals = ({ meals = [], onDeleteMeal }) => {
             <div>
               <h4 className="font-medium">{meal.name}</h4>
               <p className="text-sm text-gray-500">
-              {meal.protein}g protein | {meal.calories} cal
+                {meal.protein}g protein | {meal.calories} cal
               </p>
             </div>
             <Button
@@ -248,8 +306,9 @@ const NutritionPage = () => {
     currentCalories: 0,
     calorieGoal: 2000,
   });
-  
   const [activeTab, setActiveTab] = useState('ai');
+  const [mealDescription, setMealDescription] = useState('');
+  const [analysisResult, setAnalysisResult] = useState(null);
 
   const handleAddMeal = async (meal) => {
     if (!user) return;
@@ -307,16 +366,16 @@ const NutritionPage = () => {
       <h1 className="text-2xl font-bold mb-6">Nutrition Tracking</h1>
       <NutritionStats {...stats} />
       <WeightInput onSave={async (weight) => {
-          if (!user) return;
-          try {
-            await api.post('/api/nutrition/weight', { weight });
-            alert('Weight saved successfully!');
-            updateStats();
-          } catch (error) {
-            console.error('Error saving weight:', error);
-            alert('Failed to save weight: ' + error.message);
-          }
-        }} />
+        if (!user) return;
+        try {
+          await api.post('/api/nutrition/weight', { weight });
+          alert('Weight saved successfully!');
+          updateStats();
+        } catch (error) {
+          console.error('Error saving weight:', error);
+          alert('Failed to save weight: ' + error.message);
+        }
+      }} />
       <MealEntry
         onAddMeal={handleAddMeal}
         onSaveMeal={async (meal) => {
