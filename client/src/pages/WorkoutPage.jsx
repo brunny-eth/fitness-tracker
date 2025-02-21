@@ -3,6 +3,7 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import WorkoutLogger from '../components/workout/WorkoutLogger';
 import { api } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 const WorkoutStats = () => {
   const [todayStatus, setTodayStatus] = useState({ completed: false, workout: null });

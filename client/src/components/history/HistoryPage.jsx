@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import { Card } from '../ui/card';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const SummaryCards = ({ startingPoint, currentStatus }) => (
   <div className="grid grid-cols-2 gap-4 mb-6">
@@ -103,7 +103,6 @@ const ProgressChart = ({ data }) => (
             dataKey="nutrition.calories" 
             name="Calories"
             stroke="#ffc658" 
-            stroke={Theme.warning}
             strokeWidth={2}
             dot={{ r: 3 }}
           />

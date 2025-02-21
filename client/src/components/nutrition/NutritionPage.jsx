@@ -117,7 +117,7 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
           <TabsTrigger value="saved">Saved Meals</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="ai">
+        {activeTab === 'ai' && (
           <div className="space-y-4 mt-4">
             <Label htmlFor="mealDescription">Describe your meal</Label>
             <textarea
@@ -157,11 +157,11 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
               </div>
             )}
           </div>
-        </TabsContent>
+        )}
         
-        <TabsContent value="saved">
+        {activeTab === 'saved' && (
           <SavedMealsList onSelectMeal={onAddMeal} />
-        </TabsContent>
+        )}
       </Tabs>
     </Card>
   );
