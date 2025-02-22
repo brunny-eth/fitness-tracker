@@ -125,15 +125,15 @@ router.get('/stats', auth, async (req, res) => {
 // Get summary stats (for the header cards)
 router.get('/summary', auth, async (req, res) => {
   try {
-    // Get initial goals entry
     const initialGoals = await Goals.findOne({
       userId: req.user._id
-    }).sort({ createdAt: 1 }); // Ascending order to get first entry
+    }).sort({ createdAt: 1 });
+    console.log('Initial goals:', initialGoals);
 
-    // Get latest goals and weight
     const currentGoals = await Goals.findOne({
       userId: req.user._id
-    }).sort({ createdAt: -1 }); // Descending order to get latest entry
+    }).sort({ createdAt: -1 });
+    console.log('Current goals:', currentGoals);
 
     // Get latest weight entry
     const latestWeight = await Weight.findOne({
@@ -152,14 +152,14 @@ router.get('/summary', auth, async (req, res) => {
     res.json({
       startingPoint: {
         weight: initialGoals?.currentWeight,
-        target: initialGoals?.targetWeight,
+        targetWeight: initialGoals?.targetWeight, 
         weightGoal: initialGoals?.weightGoal,
         muscleGoal: initialGoals?.muscleGoal,
         startDate: initialGoals?.createdAt
       },
       currentStatus: {
         weight: latestWeight?.weight || currentGoals?.currentWeight,
-        targetWeight: currentGoals?.targetWeight,
+        targetWeight: currentGoals?.targetWeight,  
         workoutCount,
         lastUpdated: latestWeight?.date || currentGoals?.updatedAt
       }

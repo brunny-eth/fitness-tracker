@@ -139,65 +139,95 @@ const ProgressChart = ({ data }) => {
   );
 };
 
-const DailyEntry = ({ entry }) => (
-  <Card className="p-4 mb-4">
-    <div className="flex justify-between items-start mb-4">
-      <h3 className="text-lg font-semibold">
-        {new Date(entry.date).toLocaleDateString()}
-      </h3>
-      {entry.weight && (
-        <span className="text-gray-500">
-          {entry.weight.toFixed(1)} kg
-        </span>
-      )}
-    </div>
+const DailyEntry = ({ entry }) => {
+  const [showWorkouts, setShowWorkouts] = useState(false);
 
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span>Protein</span>
-          <span className={
-            entry.nutrition.protein >= entry.nutrition.proteinGoal 
-              ? 'text-green-600 font-semibold' 
-              : ''
-          }>
-            {entry.nutrition.protein}g / {entry.nutrition.proteinGoal}g
+  const workoutCount = entry.workouts?.length || 0;
+  const workoutLabel = workoutCount === 1 ? "Workout" : "Workouts";
+
+  return (
+    <Card className="p-4 mb-4">
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-lg font-semibold">
+          {new Date(entry.date).toLocaleDateString()}
+        </h3>
+        {entry.weight && (
+          <span className="text-gray-500">
+            {entry.weight.toFixed(1)} kg
           </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>Calories</span>
-          <span className={
-            entry.nutrition.calories <= entry.nutrition.calorieGoal 
-              ? 'text-green-600 font-semibold' 
-              : entry.nutrition.calories > 0 
-                ? 'text-red-600 font-semibold'
-                : ''
-          }>
-            {entry.nutrition.calories} / {entry.nutrition.calorieGoal}
-          </span>
-        </div>
+        )}
       </div>
 
-      {entry.workouts && entry.workouts.length > 0 && (
-        <div>
-          <h4 className="font-medium mb-2">Workouts</h4>
-          {entry.workouts.map((workout, i) => (
-            <div key={i} className="ml-4">
-              <h5 className="font-medium text-gray-700">{workout.category}</h5>
-              {workout.exercises.map((exercise, j) => (
-                <div key={j} className="ml-4 text-sm text-gray-600">
-                  {exercise.name}: {exercise.sets.map(set => 
-                    `${set.weight}kg×${set.reps}`
-                  ).join(', ')}
-                </div>
-              ))}
-            </div>
-          ))}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span>Protein</span>
+            <span className={
+              entry.nutrition.protein >= entry.nutrition.proteinGoal 
+                ? 'text-green-600 font-semibold' 
+                : ''
+            }>
+              {entry.nutrition.protein}g / {entry.nutrition.proteinGoal}g
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Calories</span>
+            <span className={
+              entry.nutrition.calories <= entry.nutrition.calorieGoal 
+                ? 'text-green-600 font-semibold' 
+                : entry.nutrition.calories > 0 
+                  ? 'text-red-600 font-semibold'
+                  : ''
+            }>
+              {entry.nutrition.calories} / {entry.nutrition.calorieGoal}
+            </span>
+          </div>
         </div>
-      )}
-    </div>
-  </Card>
-);
+
+        {workoutCount > 0 && (
+          <div>
+            <button
+              onClick={() => setShowWorkouts(!showWorkouts)}
+              className="flex items-center gap-2 font-medium text-gray-700 hover:text-gray-900"
+            >
+              <span>{workoutLabel} ({workoutCount})</span>
+              <svg 
+                className={`w-4 h-4 transform transition-transform ${showWorkouts ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M19 9l-7 7-7-7" 
+                />
+              </svg>
+            </button>
+            
+            {showWorkouts && (
+              <div className="mt-2">
+                {entry.workouts.map((workout, i) => (
+                  <div key={i} className="ml-4 mt-2">
+                    <h5 className="font-medium text-gray-700">{workout.category}</h5>
+                    {workout.exercises.map((exercise, j) => (
+                      <div key={j} className="ml-4 text-sm text-gray-600">
+                        {exercise.name}: {exercise.sets.map(set => 
+                          `${set.weight}kg×${set.reps}`
+                        ).join(', ')}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 const HistoryPage = () => {
   const { user } = useAuth();
