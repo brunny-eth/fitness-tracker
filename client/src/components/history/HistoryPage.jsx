@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import { Card } from '../ui/card';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  ResponsiveContainer, 
+  Legend 
+} from 'recharts';
 
 const SummaryCards = ({ startingPoint, currentStatus }) => (
   <div className="grid grid-cols-2 gap-4 mb-6">
@@ -30,87 +38,103 @@ const SummaryCards = ({ startingPoint, currentStatus }) => (
   </div>
 );
 
-const ProgressChart = ({ data }) => (
-  <Card className="p-4 mb-6">
-    <h3 className="text-lg font-semibold mb-4">Progress Tracking</h3>
-    <div className="h-96">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart 
-          data={data} 
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <XAxis 
-            dataKey="date" 
-            tickFormatter={str => {
-              const date = new Date(str);
-              return `${date.getMonth() + 1}/${date.getDate()}`;
-            }}
-            tick={{ fontSize: 12 }}
-          />
-          {/* Separate Y axis for weight */}
-          <YAxis 
-            yAxisId="weight" 
-            orientation="right" 
-            domain={['dataMin - 5', 'dataMax + 5']}
-            label={{ value: 'Weight (kg)', angle: 90, position: 'insideRight' }}
-          />
-          {/* Separate Y axis for nutrition */}
-          <YAxis 
-            yAxisId="nutrition" 
-            orientation="left"
-            domain={[0, 'dataMax + 20']}
-            label={{ value: 'Protein/Calories', angle: -90, position: 'insideLeft' }}
-          />
-          <Tooltip 
-            labelFormatter={value => new Date(value).toLocaleDateString()}
-            formatter={(value, name) => {
-              if (!value && value !== 0) return ['N/A', name];
-              
-              switch (name) {
-                case 'weight':
-                  return [`${value} kg`, 'Weight'];
-                case 'protein':
-                  return [`${value}g`, 'Protein'];
-                case 'calories':
-                  return [value, 'Calories'];
-                default:
-                  return [value, name];
-              }
-            }}
-          />
-          <Legend />
-          <Line 
-            yAxisId="weight"
-            type="monotone" 
-            dataKey="weight" 
-            stroke="#8884d8" 
-            strokeWidth={2}
-            dot={{ r: 3 }}
-            name="Weight"
-          />
-          <Line 
-            yAxisId="nutrition"
-            type="monotone" 
-            dataKey="nutrition.protein" 
-            name="Protein"
-            stroke="#82ca9d" 
-            strokeWidth={2}
-            dot={{ r: 3 }}
-          />
-          <Line 
-            yAxisId="nutrition"
-            type="monotone" 
-            dataKey="nutrition.calories" 
-            name="Calories"
-            stroke="#ffc658" 
-            strokeWidth={2}
-            dot={{ r: 3 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  </Card>
-);
+const ProgressChart = ({ data }) => {
+  // Define consistent colors
+  const colors = {
+    weight: '#8884d8',    // Purple
+    protein: '#82ca9d',   // Green
+    calories: '#ffc658'   // Yellow
+  };
+
+  return (
+    <Card className="p-4 mb-6">
+      <h3 className="text-lg font-semibold mb-4">Progress Tracking</h3>
+      <div className="h-96">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart 
+            data={data} 
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          >
+            <XAxis 
+              dataKey="date" 
+              tickFormatter={str => {
+                const date = new Date(str);
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+              }}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis 
+              yAxisId="weight" 
+              orientation="right" 
+              domain={['dataMin - 2', 'dataMax + 2']}
+              label={{ 
+                value: 'Weight (kg)', 
+                angle: 90, 
+                position: 'right',
+                offset: 0
+              }}
+            />
+            <YAxis 
+              yAxisId="nutrition" 
+              orientation="left"
+              domain={[0, 'dataMax + 20']}
+              label={{ 
+                value: 'Protein (g) / Calories', 
+                angle: -90, 
+                position: 'left',
+                offset: 0
+              }}
+            />
+            <Tooltip 
+              labelFormatter={value => new Date(value).toLocaleDateString()}
+              formatter={(value, name) => {
+                if (!value && value !== 0) return ['N/A', name];
+                switch (name) {
+                  case 'weight':
+                    return [`${value.toFixed(1)} kg`, 'Weight'];
+                  case 'protein':
+                    return [`${value}g`, 'Protein'];
+                  case 'calories':
+                    return [value, 'Calories'];
+                  default:
+                    return [value, name];
+                }
+              }}
+            />
+            <Legend verticalAlign="top" height={36} />
+            <Line 
+              yAxisId="weight"
+              type="monotone" 
+              dataKey="weight" 
+              stroke={colors.weight}
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              name="Weight"
+            />
+            <Line 
+              yAxisId="nutrition"
+              type="monotone" 
+              dataKey="nutrition.protein" 
+              stroke={colors.protein}
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              name="Protein"
+            />
+            <Line 
+              yAxisId="nutrition"
+              type="monotone" 
+              dataKey="nutrition.calories" 
+              stroke={colors.calories}
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              name="Calories"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+};
 
 const DailyEntry = ({ entry }) => (
   <Card className="p-4 mb-4">
@@ -120,13 +144,12 @@ const DailyEntry = ({ entry }) => (
       </h3>
       {entry.weight && (
         <span className="text-gray-500">
-          {entry.weight} kg
+          {entry.weight.toFixed(1)} kg
         </span>
       )}
     </div>
 
     <div className="space-y-4">
-      {/* Nutrition Summary */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <span>Protein</span>
@@ -152,7 +175,6 @@ const DailyEntry = ({ entry }) => (
         </div>
       </div>
 
-      {/* Workouts - Only show if there are workouts */}
       {entry.workouts && entry.workouts.length > 0 && (
         <div>
           <h4 className="font-medium mb-2">Workouts</h4>
@@ -192,14 +214,14 @@ const HistoryPage = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch summary data
-      const summaryData = await api.get('/api/history/summary');
-      setSummary(summaryData);
+      const [summaryData, statsData] = await Promise.all([
+        api.get('/api/history/summary'),
+        api.get('/api/history/stats')
+      ]);
 
-      // Fetch historical stats
-      const statsData = await api.get('/api/history/stats');
+      setSummary(summaryData);
       
-      // Ensure data is sorted chronologically for the chart
+      // Sort data chronologically
       const sortedData = [...statsData].sort((a, b) => 
         new Date(a.date) - new Date(b.date)
       );
@@ -207,20 +229,36 @@ const HistoryPage = () => {
       setHistoryData(sortedData);
     } catch (err) {
       console.error('Error fetching history:', err);
-      setError('Failed to load history data: ' + (err.message || 'Unknown error'));
+      setError('Failed to load history data. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return (
+      <div className="max-w-2xl mx-auto p-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-32 bg-gray-200 rounded"></div>
+          <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
-        {error}
+      <div className="max-w-2xl mx-auto p-4">
+        <Card className="p-4 bg-red-50 text-red-700">
+          <p>{error}</p>
+          <button 
+            onClick={fetchData}
+            className="mt-2 text-sm underline"
+          >
+            Try Again
+          </button>
+        </Card>
       </div>
     );
   }
