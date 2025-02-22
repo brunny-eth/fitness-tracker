@@ -37,7 +37,7 @@ const WorkoutLogger = ({ category }) => {
 
   const handleCompleteWorkout = async () => {
     if (!user || exercises.length === 0) return;
-
+  
     try {
       setIsCompleting(true);
       setError(null);
@@ -50,20 +50,23 @@ const WorkoutLogger = ({ category }) => {
         sets: exercise.sets || []
       }));
       
-      // Send to API
+      // Send to API and save workout...
       await api.post('/api/workouts/log', {
         categoryId: category._id,
         exercises: formattedExercises,
         completedAt: new Date().toISOString()
       });
   
-      // Clear local storage and reset state
+      // Clear storage and state...
       localStorage.removeItem(storageKey);
       setExercises([]);
       setCurrentExercise(null);
       setSuccessMessage('Workout completed successfully!');
       
-      // After a short delay, navigate back to the workout list
+      // Dispatch workout complete event
+      window.dispatchEvent(new Event('workoutComplete'));
+      
+      // Navigate after delay
       setTimeout(() => {
         navigate('/workouts');
       }, 2000);
@@ -74,7 +77,7 @@ const WorkoutLogger = ({ category }) => {
     } finally {
       setIsCompleting(false);
     }
-  };
+  };  
 
   // Save workout to localStorage whenever exercises change
   useEffect(() => {

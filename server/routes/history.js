@@ -9,13 +9,6 @@ import User from '../models/user.js';
 
 const router = express.Router();
 
-const getDateString = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 router.get('/stats', auth, async (req, res) => {
   try {
     const endDate = new Date();
@@ -135,12 +128,17 @@ router.get('/summary', auth, async (req, res) => {
     // Get initial goals entry
     const initialGoals = await Goals.findOne({
       userId: req.user._id
-    }).sort('createdAt');
+    }).sort({ createdAt: 1 }); // Ascending order to get first entry
 
-    // Get latest goals entry
+    // Get latest goals and weight
     const currentGoals = await Goals.findOne({
       userId: req.user._id
-    }).sort('-createdAt');
+    }).sort({ createdAt: -1 }); // Descending order to get latest entry
+
+    // Get latest weight entry
+    const latestWeight = await Weight.findOne({
+      userId: req.user._id
+    }).sort({ date: -1 });
 
     // Get workout count for last 30 days
     const startDate = new Date();
@@ -155,12 +153,15 @@ router.get('/summary', auth, async (req, res) => {
       startingPoint: {
         weight: initialGoals?.currentWeight,
         target: initialGoals?.targetWeight,
+        weightGoal: initialGoals?.weightGoal,
+        muscleGoal: initialGoals?.muscleGoal,
         startDate: initialGoals?.createdAt
       },
       currentStatus: {
-        weight: currentGoals?.currentWeight,
+        weight: latestWeight?.weight || currentGoals?.currentWeight,
+        targetWeight: currentGoals?.targetWeight,
         workoutCount,
-        lastUpdated: currentGoals?.updatedAt
+        lastUpdated: latestWeight?.date || currentGoals?.updatedAt
       }
     });
   } catch (error) {

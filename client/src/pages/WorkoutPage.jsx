@@ -11,57 +11,78 @@ const WorkoutStats = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchWorkoutStats = async () => {
-      if (!user) return;
-      
-      try {
-        setLoading(true);
-        
-        // Get workout history
-        const workouts = await api.get('/api/workouts/history');
-        
-        // Check if we have a workout today
-        const today = new Date().toISOString().split('T')[0];
-        const todayWorkout = workouts.find(workout => 
-          new Date(workout.date).toISOString().split('T')[0] === today
-        );
-        
-        if (todayWorkout) {
-          setTodayStatus({
-            completed: true,
-            workout: todayWorkout
-          });
-        }
-        
-        // Find the most recent workout that's not today
-        const recentWorkouts = workouts.filter(workout => 
-          new Date(workout.date).toISOString().split('T')[0] !== today
-        );
-        
-        if (recentWorkouts.length > 0) {
-          setLastWorkout(recentWorkouts[0]); // First one is the most recent
-        }
-      } catch (error) {
-        console.error('Error fetching workout stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchWorkoutStats = async () => {
+    if (!user) return;
     
+    try {
+      setLoading(true);
+      const workouts = await api.get('/api/workouts/history');
+      
+      // Get today's date in YYYY-MM-DD format
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Find today's workout if it exists
+      const todayWorkout = workouts.find(workout => 
+        new Date(workout.date).toISOString().split('T')[0] === today
+      );
+      
+      if (todayWorkout) {
+        setTodayStatus({
+          completed: true,
+          workout: todayWorkout
+        });
+      } else {
+        setTodayStatus({
+          completed: false,
+          workout: null
+        });
+      }
+      
+      // Find the most recent workout that's not today
+      const previousWorkouts = workouts.filter(workout => 
+        new Date(workout.date).toISOString().split('T')[0] !== today
+      );
+      
+      if (previousWorkouts.length > 0) {
+        setLastWorkout(previousWorkouts[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching workout stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch on mount
+  useEffect(() => {
     fetchWorkoutStats();
   }, [user]);
+
+  // Re-fetch when workout is completed
+  useEffect(() => {
+    // Listen for workout completion event
+    const handleWorkoutComplete = () => {
+      fetchWorkoutStats();
+    };
+
+    window.addEventListener('workoutComplete', handleWorkoutComplete);
+    return () => window.removeEventListener('workoutComplete', handleWorkoutComplete);
+  }, []);
 
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="p-4">
-          <h3 className="text-lg font-semibold">Today's Status</h3>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
         </Card>
         <Card className="p-4">
-          <h3 className="text-lg font-semibold">Last Workout</h3>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
         </Card>
       </div>
     );
@@ -88,7 +109,7 @@ const WorkoutStats = () => {
         <h3 className="text-lg font-semibold">Last Workout</h3>
         {lastWorkout ? (
           <>
-            <p className="text-gray-600 font-medium">
+            <p className="text-gray-600">
               {new Date(lastWorkout.date).toLocaleDateString()} - {lastWorkout.category}
             </p>
             <p className="text-gray-600 text-sm">

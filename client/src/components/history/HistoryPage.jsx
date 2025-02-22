@@ -18,7 +18,9 @@ const SummaryCards = ({ startingPoint, currentStatus }) => (
       <h3 className="text-lg font-semibold mb-2">Starting Point</h3>
       <div className="space-y-2">
         <p>Starting weight: {startingPoint?.weight?.toFixed(1)} kg</p>
-        <p>Weight Target: {startingPoint?.target?.toFixed(1)} kg</p>
+        <p>Initial goal: {startingPoint?.weightGoal === 'gain' ? 'Gain Weight' : 
+          startingPoint?.weightGoal === 'lose' ? 'Lose Weight' : 'Maintain Weight'}</p>
+        <p>Target: {startingPoint?.muscleGoal === 'gain' ? 'Build Muscle' : 'Maintain Muscle'}</p>
         <p className="text-sm text-gray-500">
           Started {new Date(startingPoint?.startDate).toLocaleDateString()}
         </p>
@@ -29,6 +31,7 @@ const SummaryCards = ({ startingPoint, currentStatus }) => (
       <h3 className="text-lg font-semibold mb-2">Current Status</h3>
       <div className="space-y-2">
         <p>Current weight: {currentStatus?.weight?.toFixed(1)} kg</p>
+        <p>Target weight: {currentStatus?.targetWeight?.toFixed(1)} kg</p>
         <p>Exercised {currentStatus?.workoutCount} times in the last 30 days</p>
         <p className="text-sm text-gray-500">
           Last weighed: {new Date(currentStatus?.lastUpdated).toLocaleDateString()}
@@ -275,7 +278,7 @@ const HistoryPage = () => {
       <ProgressChart data={historyData} />
 
       <div className="space-y-4">
-        {historyData.map((entry) => (
+        {[...historyData].reverse().map((entry) => (
           <DailyEntry key={entry.date} entry={entry} />
         ))}
       </div>
