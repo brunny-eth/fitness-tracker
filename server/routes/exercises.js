@@ -72,6 +72,38 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+router.get('/last/:categoryId/:exerciseId', auth, async (req, res) => {
+  try {
+    const { categoryId, exerciseId } = req.params;
+    
+    // Find the most recent workout in this category that includes this exercise
+    const lastWorkout = await Workout.findOne({
+      userId: req.user._id,
+      'exercises.exerciseId': exerciseId,
+      categoryId: categoryId
+    })
+    .sort({ date: -1 })
+    .select('date exercises');
+
+    if (!lastWorkout) {
+      return res.json({ message: 'No previous data found' });
+    }
+
+    // Find the specific exercise data from this workout
+    const exerciseData = lastWorkout.exercises.find(e => 
+      e.exerciseId.toString() === exerciseId
+    );
+
+    res.json({
+      date: lastWorkout.date,
+      sets: exerciseData.sets
+    });
+  } catch (error) {
+    console.error('Error fetching exercise history:', error);
+    res.status(500).json({ message: 'Error fetching exercise history' });
+  }
+});
+
 // Soft delete exercise
 router.delete('/:id', auth, async (req, res) => {
   try {

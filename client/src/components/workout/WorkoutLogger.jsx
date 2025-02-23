@@ -6,6 +6,7 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import ExerciseSelector from './ExerciseSelector';
 import SetLogger from './SetLogger';
+import LastExerciseStats from './LastExerciseStats';
 
 const WorkoutLogger = ({ category }) => {
   const { user } = useAuth();
@@ -53,7 +54,11 @@ const WorkoutLogger = ({ category }) => {
       // Send to API and save workout...
       await api.post('/api/workouts/log', {
         categoryId: category._id,
-        exercises: formattedExercises,
+        exercises: formattedExercises.map(exercise => ({
+          exerciseId: exercise._id,
+          name: exercise.name,
+          sets: exercise.sets || []
+        })),
         completedAt: new Date().toISOString()
       });
   
@@ -175,10 +180,16 @@ const WorkoutLogger = ({ category }) => {
       />
 
       {currentExercise && (
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-4">{currentExercise.name}</h3>
-          <SetLogger onSaveSet={handleSaveSet} />
-        </Card>
+        <div className="space-y-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-4">{currentExercise.name}</h3>
+            <LastExerciseStats 
+              categoryId={category._id} 
+              exerciseId={currentExercise._id}
+            />
+            <SetLogger onSaveSet={handleSaveSet} />
+          </Card>
+        </div>
       )}
 
       {exercises.length > 0 && (
