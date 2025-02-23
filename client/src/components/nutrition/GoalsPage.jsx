@@ -1,4 +1,3 @@
-// File: client/src/components/nutrition/GoalsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
@@ -27,6 +26,8 @@ const GoalsPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -39,8 +40,15 @@ const GoalsPage = () => {
       const data = await api.get('/api/goals');
       setGoals(data);
       updateCalculations(data);
+      setIsNewUser(false);
     } catch (err) {
-      setError('Failed to load goals');
+      // If the error is 404, this is likely a new user
+      if (err.message.includes('404') || err.message.includes('not found')) {
+        setIsNewUser(true);
+      } else {
+        setError('Failed to load goals');
+        setIsNewUser(false);
+      }
     }
   };
 
@@ -73,6 +81,7 @@ const GoalsPage = () => {
     
     setLoading(true);
     setError('');
+    setSuccessMessage('');
 
     try {
       const savedGoals = await api.post('/api/goals', {
@@ -83,6 +92,11 @@ const GoalsPage = () => {
       });
       
       setGoals(savedGoals);
+      setSuccessMessage('Goals saved successfully!');
+      setIsNewUser(false);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -94,9 +108,27 @@ const GoalsPage = () => {
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Set Your Fitness Goals</h1>
       
+      {isNewUser && (
+        <Card className="mb-6 bg-blue-50">
+          <div className="p-6">
+            <p className="text-gray-700 leading-relaxed">
+              FitnessTracker.Me makes it simple to get started by just setting a few high-level goals - we don't want to overthink the process.
+              <br /><br />
+              Start by setting these weight goals and a timeline, and your nutrition needs will change based on your daily updated weight and your goals. You can always change your goals in the future.
+            </p>
+          </div>
+        </Card>
+      )}
+      
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {successMessage}
         </div>
       )}
 

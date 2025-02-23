@@ -22,7 +22,7 @@ const RegisterPage = () => {
 
     try {
       await register(username, password);
-      navigate('/');
+      navigate('/goals');
     } catch (err) {
       setError(err.message);
     } finally {

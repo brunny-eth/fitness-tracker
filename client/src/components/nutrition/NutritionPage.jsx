@@ -119,7 +119,6 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
         
         {activeTab === 'ai' && (
           <div className="space-y-4 mt-4">
-            <Label htmlFor="mealDescription">Describe your meal</Label>
             <textarea
               id="mealDescription"
               value={mealDescription}
