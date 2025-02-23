@@ -138,22 +138,28 @@ const MealEntry = ({ onAddMeal, onSaveMeal }) => {
 
             {analysisResult && (
               <div className="mt-4 space-y-4">
-                <div className="flex justify-between">
-                  <span>Protein: {analysisResult.protein}g</span>
-                  <span>Calories: {analysisResult.calories}</span>
+              <div className="space-y-2">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Protein</span>
+                  <span>{analysisResult.protein}g</span>
                 </div>
-                <div className="flex gap-2">
-                  <Button onClick={() => onAddMeal(analysisResult)}>
-                    Add to Today
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => onSaveMeal(analysisResult)}
-                  >
-                    Save for Later
-                  </Button>
+                <div className="flex justify-between">
+                  <span className="font-medium">Calories</span>
+                  <span>{analysisResult.calories}</span>
                 </div>
               </div>
+              <div className="flex gap-2">
+                <Button onClick={() => onAddMeal(analysisResult)}>
+                  Add to Today
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => onSaveMeal(analysisResult)}
+                >
+                  Save for Later
+                </Button>
+              </div>
+            </div>
             )}
           </div>
         )}
