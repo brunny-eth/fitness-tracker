@@ -1,3 +1,4 @@
+// client/src/components/workout/WorkoutLogger.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -44,25 +45,26 @@ const WorkoutLogger = ({ category }) => {
       setError(null);
       setSuccessMessage(null);
       
-      // Format the exercises data properly for the API
+      // Format the exercises data properly for the API, ensuring exerciseId is included
       const formattedExercises = exercises.map(exercise => ({
-        exerciseId: exercise._id,
+        exerciseId: exercise._id, // Ensure exerciseId is explicitly passed
         name: exercise.name,
         sets: exercise.sets || []
       }));
       
-      // Send to API and save workout...
+      console.log('Sending workout data:', {
+        categoryId: category._id,
+        exercises: formattedExercises
+      });
+      
+      // Send to API and save workout
       await api.post('/api/workouts/log', {
         categoryId: category._id,
-        exercises: formattedExercises.map(exercise => ({
-          exerciseId: exercise._id,
-          name: exercise.name,
-          sets: exercise.sets || []
-        })),
+        exercises: formattedExercises,
         completedAt: new Date().toISOString()
       });
   
-      // Clear storage and state...
+      // Clear storage and state
       localStorage.removeItem(storageKey);
       setExercises([]);
       setCurrentExercise(null);

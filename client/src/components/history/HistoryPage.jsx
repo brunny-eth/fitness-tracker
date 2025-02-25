@@ -12,34 +12,43 @@ import {
   Legend 
 } from 'recharts';
 
-const SummaryCards = ({ startingPoint, currentStatus }) => (
-  <div className="grid grid-cols-2 gap-4 mb-6">
-    <Card className="p-4">
-      <h3 className="text-lg font-semibold mb-2">Starting Point</h3>
-      <div className="space-y-2">
-        <p>Starting weight: {startingPoint?.weight?.toFixed(1)} kg</p>
-        <p>Initial goal: {startingPoint?.weightGoal === 'gain' ? 'Gain Weight' : 
-          startingPoint?.weightGoal === 'lose' ? 'Lose Weight' : 'Maintain Weight'}</p>
-        <p>Target: {startingPoint?.muscleGoal === 'gain' ? 'Build Muscle' : 'Maintain Muscle'}</p>
-        <p className="text-sm text-gray-500">
-          Started {new Date(startingPoint?.startDate).toLocaleDateString()}
-        </p>
-      </div>
-    </Card>
 
-    <Card className="p-4">
-      <h3 className="text-lg font-semibold mb-2">Current Status</h3>
-      <div className="space-y-2">
-        <p>Current weight: {currentStatus?.weight?.toFixed(1)} kg</p>
-        <p>Target weight: {currentStatus?.targetWeight?.toFixed(1)} kg</p>
-        <p>Exercised {currentStatus?.workoutCount} times in the last 30 days</p>
-        <p className="text-sm text-gray-500">
-          Last weighed: {new Date(currentStatus?.lastUpdated).toLocaleDateString()}
-        </p>
-      </div>
-    </Card>
-  </div>
-);
+const SummaryCards = ({ startingPoint, currentStatus }) => {
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-4 mb-6">
+      <Card className="p-4">
+        <h3 className="text-lg font-semibold mb-2">Starting Point</h3>
+        <div className="space-y-2">
+          <p>Starting weight: {startingPoint?.weight?.toFixed(1) || 'N/A'} kg</p>
+          <p>Initial goal: {startingPoint?.weightGoal === 'gain' ? 'Gain Weight' : 
+            startingPoint?.weightGoal === 'lose' ? 'Lose Weight' : 'Maintain Weight'}</p>
+          <p>Target: {startingPoint?.muscleGoal === 'gain' ? 'Build Muscle' : 'Maintain Muscle'}</p>
+          <p className="text-sm text-gray-500">
+            Started {formatDate(startingPoint?.startDate)}
+          </p>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="text-lg font-semibold mb-2">Current Status</h3>
+        <div className="space-y-2">
+          <p>Current weight: {currentStatus?.weight?.toFixed(1) || 'N/A'} kg</p>
+          <p>Target weight: {currentStatus?.targetWeight?.toFixed(1) || 'N/A'} kg</p>
+          <p>Exercised {currentStatus?.workoutCount || 0} times in the last 30 days</p>
+          <p className="text-sm text-gray-500">
+            Last weighed: {formatDate(currentStatus?.lastUpdated)}
+          </p>
+        </div>
+      </Card>
+    </div>
+  );
+};
 
 const ProgressChart = ({ data }) => {
   // Define consistent colors
@@ -47,6 +56,13 @@ const ProgressChart = ({ data }) => {
     weight: '#8884d8',    // Purple
     protein: '#82ca9d',   // Green
     calories: '#ffc658'   // Yellow
+  };
+
+  // Format date for chart display
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr + 'T00:00:00.000Z');
+    return `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
   return (
@@ -60,10 +76,7 @@ const ProgressChart = ({ data }) => {
           >
             <XAxis 
               dataKey="date" 
-              tickFormatter={str => {
-                const date = new Date(str);
-                return `${date.getMonth() + 1}/${date.getDate()}`;
-              }}
+              tickFormatter={formatDate}
               tick={{ fontSize: 12 }}
             />
             <YAxis 
@@ -89,7 +102,10 @@ const ProgressChart = ({ data }) => {
               }}
             />
             <Tooltip 
-              labelFormatter={value => new Date(value).toLocaleDateString()}
+              labelFormatter={value => {
+                // Display date in a more readable format
+                return formatDate(value);
+              }}
               formatter={(value, name) => {
                 if (!value && value !== 0) return ['N/A', name];
                 switch (name) {
@@ -113,6 +129,7 @@ const ProgressChart = ({ data }) => {
               strokeWidth={2}
               dot={{ r: 3 }}
               name="Weight"
+              connectNulls={true}
             />
             <Line 
               yAxisId="nutrition"
@@ -122,6 +139,7 @@ const ProgressChart = ({ data }) => {
               strokeWidth={2}
               dot={{ r: 3 }}
               name="Protein"
+              connectNulls={true}
             />
             <Line 
               yAxisId="nutrition"
@@ -131,6 +149,7 @@ const ProgressChart = ({ data }) => {
               strokeWidth={2}
               dot={{ r: 3 }}
               name="Calories"
+              connectNulls={true}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -145,11 +164,18 @@ const DailyEntry = ({ entry }) => {
   const workoutCount = entry.workouts?.length || 0;
   const workoutLabel = workoutCount === 1 ? "Workout" : "Workouts";
 
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    // Use the date string directly to avoid timezone conversion issues
+    // The date is already in YYYY-MM-DD format from the server
+    return new Date(dateString + 'T00:00:00.000Z').toLocaleDateString();
+  };
+
   return (
     <Card className="p-4 mb-4">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-lg font-semibold">
-          {new Date(entry.date).toLocaleDateString()}
+          {formatDate(entry.date)}
         </h3>
         {entry.weight && (
           <span className="text-gray-500">
@@ -246,16 +272,21 @@ const HistoryPage = () => {
     try {
       setLoading(true);
       setError(null);
-
+  
       const [summaryData, statsData] = await Promise.all([
         api.get('/api/history/summary'),
         api.get('/api/history/stats')
       ]);
-
+  
       setSummary(summaryData);
       
+      // Filter out dates with no data
+      const filteredData = statsData.filter(day => 
+        day.weight || day.nutrition.protein > 0 || day.nutrition.calories > 0 || day.workouts.length > 0
+      );
+      
       // Sort data chronologically
-      const sortedData = [...statsData].sort((a, b) => 
+      const sortedData = [...filteredData].sort((a, b) => 
         new Date(a.date) - new Date(b.date)
       );
       
@@ -296,6 +327,11 @@ const HistoryPage = () => {
     );
   }
 
+  // Only filter out records with no data for the daily entries, not the chart
+  const entriesWithData = historyData.filter(entry => 
+    entry.weight || entry.nutrition.protein > 0 || entry.nutrition.calories > 0 || entry.workouts.length > 0
+  );
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Progress History</h1>
@@ -308,7 +344,7 @@ const HistoryPage = () => {
       <ProgressChart data={historyData} />
 
       <div className="space-y-4">
-        {[...historyData].reverse().map((entry) => (
+        {[...entriesWithData].reverse().map((entry) => (
           <DailyEntry key={entry.date} entry={entry} />
         ))}
       </div>
