@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Clock } from 'lucide-react';
+import { api } from '../../utils/api';
 
 const LastExerciseStats = ({ categoryId, exerciseId }) => {
   const [lastWorkout, setLastWorkout] = useState(null);
@@ -9,19 +10,14 @@ const LastExerciseStats = ({ categoryId, exerciseId }) => {
 
   useEffect(() => {
     const fetchLastWorkout = async () => {
+      if (!categoryId || !exerciseId) {
+        setLoading(false);
+        return;
+      }
+      
       try {
         setLoading(true);
-        console.log('Fetching exercise history for:', {categoryId, exerciseId});
-        const response = await fetch(
-          `/api/exercises/last/${categoryId}/${exerciseId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          }
-        );
-        const data = await response.json();
-        console.log('Received data:', data); 
+        const data = await api.get(`/api/exercises/last/${categoryId}/${exerciseId}`);
         setLastWorkout(data);
       } catch (err) {
         console.error('Error fetching last workout:', err);
@@ -30,9 +26,7 @@ const LastExerciseStats = ({ categoryId, exerciseId }) => {
       }
     };
 
-    if (categoryId && exerciseId) {
-      fetchLastWorkout();
-    }
+    fetchLastWorkout();
   }, [categoryId, exerciseId]);
 
   if (loading) {

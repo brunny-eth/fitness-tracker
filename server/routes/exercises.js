@@ -1,7 +1,7 @@
 import express from 'express';
 import ExerciseTemplate from '../models/exercise.js';
-import { auth } from '../middleware/auth.js';
 import Workout from '../models/workout.js';
+import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -76,39 +76,35 @@ router.get('/', auth, async (req, res) => {
 router.get('/last/:categoryId/:exerciseId', auth, async (req, res) => {
   try {
     const { categoryId, exerciseId } = req.params;
-    console.log('Fetching last workout for:', {categoryId, exerciseId}); 
     
-    // Find the most recent workout
+    // Find the most recent workout in this category that includes this exercise
     const lastWorkout = await Workout.findOne({
       userId: req.user._id,
-      'exercises.exerciseId': exerciseId,
-      categoryId: categoryId
+      categoryId: categoryId,
+      'exercises.exerciseId': exerciseId
     })
     .sort({ date: -1 })
     .select('date exercises');
-
-    console.log('Found workout:', lastWorkout); 
 
     if (!lastWorkout) {
       return res.json({ message: 'No previous data found' });
     }
 
-    // Find the specific exercise data
+    // Find the specific exercise data from this workout
     const exerciseData = lastWorkout.exercises.find(e => 
       e.exerciseId.toString() === exerciseId
     );
 
-    console.log('Found exercise data:', exerciseData); 
-
     res.json({
       date: lastWorkout.date,
-      sets: exerciseData.sets
+      sets: exerciseData?.sets || []
     });
   } catch (error) {
     console.error('Error fetching exercise history:', error);
     res.status(500).json({ message: 'Error fetching exercise history' });
   }
 });
+
 
 // Soft delete exercise
 router.delete('/:id', auth, async (req, res) => {
