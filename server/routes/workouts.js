@@ -1,3 +1,4 @@
+// server/routes/workouts.js
 import express from 'express';
 import { auth } from '../middleware/auth.js';
 import Workout from '../models/workout.js';
@@ -21,8 +22,9 @@ router.post('/log', auth, async (req, res) => {
       return res.status(404).json({ error: 'Category not found' });
     }
 
-    // Create workout with properly formatted exercises
+    // Create workout with properly formatted exercises including exerciseId
     const formattedExercises = exercises.map(exercise => ({
+      exerciseId: exercise.exerciseId, // Include the exerciseId
       name: exercise.name,
       sets: Array.isArray(exercise.sets) ? exercise.sets : [],
       notes: exercise.notes || ''
@@ -30,6 +32,7 @@ router.post('/log', auth, async (req, res) => {
 
     const workout = new Workout({
       userId: req.user._id,
+      categoryId: categoryId, // Store the categoryId reference
       category: category.name,
       exercises: formattedExercises,
       date: completedAt || new Date()

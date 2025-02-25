@@ -11,6 +11,7 @@ const LastExerciseStats = ({ categoryId, exerciseId }) => {
     const fetchLastWorkout = async () => {
       try {
         setLoading(true);
+        console.log('Fetching exercise history for:', {categoryId, exerciseId});
         const response = await fetch(
           `/api/exercises/last/${categoryId}/${exerciseId}`,
           {
@@ -20,6 +21,7 @@ const LastExerciseStats = ({ categoryId, exerciseId }) => {
           }
         );
         const data = await response.json();
+        console.log('Received data:', data); 
         setLastWorkout(data);
       } catch (err) {
         console.error('Error fetching last workout:', err);

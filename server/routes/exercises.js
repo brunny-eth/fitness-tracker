@@ -1,6 +1,7 @@
 import express from 'express';
 import ExerciseTemplate from '../models/exercise.js';
 import { auth } from '../middleware/auth.js';
+import Workout from '../models/workout.js';
 
 const router = express.Router();
 
@@ -75,8 +76,9 @@ router.get('/', auth, async (req, res) => {
 router.get('/last/:categoryId/:exerciseId', auth, async (req, res) => {
   try {
     const { categoryId, exerciseId } = req.params;
+    console.log('Fetching last workout for:', {categoryId, exerciseId}); 
     
-    // Find the most recent workout in this category that includes this exercise
+    // Find the most recent workout
     const lastWorkout = await Workout.findOne({
       userId: req.user._id,
       'exercises.exerciseId': exerciseId,
@@ -85,14 +87,18 @@ router.get('/last/:categoryId/:exerciseId', auth, async (req, res) => {
     .sort({ date: -1 })
     .select('date exercises');
 
+    console.log('Found workout:', lastWorkout); 
+
     if (!lastWorkout) {
       return res.json({ message: 'No previous data found' });
     }
 
-    // Find the specific exercise data from this workout
+    // Find the specific exercise data
     const exerciseData = lastWorkout.exercises.find(e => 
       e.exerciseId.toString() === exerciseId
     );
+
+    console.log('Found exercise data:', exerciseData); 
 
     res.json({
       date: lastWorkout.date,
