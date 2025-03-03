@@ -90,36 +90,58 @@ const WorkoutStats = () => {
 
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold">Today's Status</h3>
-        {todayStatus.completed ? (
-          <>
-            <p className="text-green-600 font-medium">Workout completed</p>
-            <p className="text-gray-600">{todayStatus.workout.category}</p>
-            <p className="text-gray-600 text-sm">
-              {todayStatus.workout.exercises.length} exercises
-            </p>
-          </>
-        ) : (
-          <p className="text-gray-600">No workout logged yet today</p>
-        )}
-      </Card>
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold">Today's Status</h3>
+            {todayStatus.completed ? (
+              <div>
+                <p className="text-green-600 font-medium">Workout completed</p>
+                <p className="text-gray-600 font-medium">{todayStatus.workout.category}</p>
+                <div className="mt-1">
+                  {todayStatus.workout.exercises.map((exercise, index) => (
+                    <div key={index} className="text-sm text-gray-600 ml-2">
+                      • {exercise.name} 
+                      {exercise.sets && exercise.sets.length > 0 && (
+                        <span className="text-xs text-gray-500 ml-1">
+                          ({exercise.sets.length} {exercise.sets.length === 1 ? 'set' : 'sets'})
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-600">No workout logged yet today</p>
+            )}
+          </Card>
       
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold">Last Workout</h3>
-        {lastWorkout ? (
-          <>
-            <p className="text-gray-600">
-              {new Date(lastWorkout.date).toLocaleDateString()} - {lastWorkout.category}
-            </p>
-            <p className="text-gray-600 text-sm">
-              {lastWorkout.exercises.length} exercises
-            </p>
-          </>
-        ) : (
-          <p className="text-gray-600">No previous workouts found</p>
-        )}
-      </Card>
+              <Card className="p-4">
+          <h3 className="text-lg font-semibold">Previous Workout</h3>
+          {lastWorkout ? (
+            <div>
+              <p className="text-gray-600 font-medium">
+                {new Date(lastWorkout.date).toLocaleDateString('en-US', {
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric'
+                })} - {lastWorkout.category}
+              </p>
+              <div className="mt-2">
+                {lastWorkout.exercises.map((exercise, index) => (
+                  <div key={index} className="text-sm text-gray-600 ml-2">
+                    • {exercise.name} 
+                    {exercise.sets && exercise.sets.length > 0 && (
+                      <span className="text-xs text-gray-500 ml-1">
+                        ({exercise.sets.length} {exercise.sets.length === 1 ? 'set' : 'sets'})
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-600">No previous workouts found</p>
+          )}
+        </Card>
     </div>
   );
 };
