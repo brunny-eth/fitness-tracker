@@ -51,33 +51,85 @@ const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieG
 
 const WeightInput = ({ onSave }) => {
   const [weight, setWeight] = useState('');
+  const [todayWeight, setTodayWeight] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const checkTodayWeight = async () => {
+      if (!user) return;
+      
+      try {
+        setIsLoading(true);
+        // Fetch the most recent weight entry
+        const weights = await api.get('/api/nutrition/weight/history');
+        
+        if (weights && weights.length > 0) {
+          const mostRecent = weights[0]; // Already sorted by date desc
+          
+          // Check if the most recent entry is from today
+          const today = new Date().toISOString().split('T')[0];
+          const entryDate = new Date(mostRecent.date).toISOString().split('T')[0];
+          
+          if (today === entryDate) {
+            setTodayWeight(mostRecent);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking today\'s weight:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkTodayWeight();
+  }, [user]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (weight) {
       onSave(parseFloat(weight));
+      // Update the UI immediately after saving
+      setTodayWeight({ 
+        weight: parseFloat(weight), 
+        date: new Date() 
+      });
       setWeight('');
     }
   };
 
+  if (isLoading) {
+    return <Card className="p-4 mb-6"><div>Loading...</div></Card>;
+  }
+
   return (
     <Card className="p-4 mb-6">
-      <form onSubmit={handleSubmit} className="flex gap-4 items-center">
-        <div className="flex-1">
-          <Label htmlFor="weight">Today's Weight (kg)</Label>
-          <Input
-            type="number"
-            id="weight"
-            step="0.1"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            placeholder="Enter weight"
-          />
+      {todayWeight ? (
+        <div>
+          <h3 className="font-medium mb-2">Today's Weight</h3>
+          <div className="text-lg font-semibold">{todayWeight.weight.toFixed(1)} kg</div>
+          <p className="text-sm text-gray-500 mt-2">
+            You've already logged your weight today.
+          </p>
         </div>
-        <Button type="submit" className="mt-6">
-          Save
-        </Button>
-      </form>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex gap-4 items-center">
+          <div className="flex-1">
+            <Label htmlFor="weight">Today's Weight (kg)</Label>
+            <Input
+              type="number"
+              id="weight"
+              step="0.1"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              placeholder="Enter weight"
+            />
+          </div>
+          <Button type="submit" className="mt-6">
+            Save
+          </Button>
+        </form>
+      )}
       <p className="text-sm text-gray-500 mt-2">
         Tip: Weigh yourself at the same time each day for consistency
       </p>
