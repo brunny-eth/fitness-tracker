@@ -10,6 +10,8 @@ const WorkoutStats = () => {
   const [lastWorkout, setLastWorkout] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const [showAllExercises, setShowAllExercises] = useState(false);
+  const MAX_VISIBLE_EXERCISES = 3;
 
   const fetchWorkoutStats = async () => {
     if (!user) return;
@@ -90,43 +92,27 @@ const WorkoutStats = () => {
 
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold">Today's Status</h3>
-            {todayStatus.completed ? (
-              <div>
-                <p className="text-green-600 font-medium">Workout completed</p>
-                <p className="text-gray-600 font-medium">{todayStatus.workout.category}</p>
-                <div className="mt-1">
-                  {todayStatus.workout.exercises.map((exercise, index) => (
-                    <div key={index} className="text-sm text-gray-600 ml-2">
-                      • {exercise.name} 
-                      {exercise.sets && exercise.sets.length > 0 && (
-                        <span className="text-xs text-gray-500 ml-1">
-                          ({exercise.sets.length} {exercise.sets.length === 1 ? 'set' : 'sets'})
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="text-gray-600">No workout logged yet today</p>
-            )}
-          </Card>
-      
-              <Card className="p-4">
-          <h3 className="text-lg font-semibold">Previous Workout</h3>
-          {lastWorkout ? (
-            <div>
-              <p className="text-gray-600 font-medium">
-                {new Date(lastWorkout.date).toLocaleDateString('en-US', {
-                  month: 'short', 
-                  day: 'numeric', 
-                  year: 'numeric'
-                })} - {lastWorkout.category}
-              </p>
-              <div className="mt-2">
-                {lastWorkout.exercises.map((exercise, index) => (
+      <Card className="p-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">Today's Status</h3>
+          {todayStatus.completed ? (
+            <span className="text-green-600 text-sm font-medium px-2 py-1 bg-green-100 rounded-full">
+              Completed
+            </span>
+          ) : (
+            <span className="text-gray-600 text-sm font-medium px-2 py-1 bg-gray-100 rounded-full">
+              Not completed
+            </span>
+          )}
+        </div>
+        
+        {todayStatus.completed ? (
+          <div>
+            <p className="text-gray-600 font-medium mt-2">{todayStatus.workout.category}</p>
+            <div className="mt-1">
+              {todayStatus.workout.exercises
+                .slice(0, showAllExercises ? undefined : MAX_VISIBLE_EXERCISES)
+                .map((exercise, index) => (
                   <div key={index} className="text-sm text-gray-600 ml-2">
                     • {exercise.name} 
                     {exercise.sets && exercise.sets.length > 0 && (
@@ -135,13 +121,81 @@ const WorkoutStats = () => {
                       </span>
                     )}
                   </div>
-                ))}
-              </div>
+              ))}
+              
+              {!showAllExercises && todayStatus.workout.exercises.length > MAX_VISIBLE_EXERCISES && (
+                <button 
+                  onClick={() => setShowAllExercises(true)}
+                  className="text-xs text-blue-600 hover:underline mt-1"
+                >
+                  Show {todayStatus.workout.exercises.length - MAX_VISIBLE_EXERCISES} more...
+                </button>
+              )}
+              
+              {showAllExercises && (
+                <button 
+                  onClick={() => setShowAllExercises(false)}
+                  className="text-xs text-blue-600 hover:underline mt-1"
+                >
+                  Show less
+                </button>
+              )}
             </div>
-          ) : (
-            <p className="text-gray-600">No previous workouts found</p>
-          )}
-        </Card>
+          </div>
+        ) : (
+          <p className="text-gray-600 mt-2">No workout logged yet today</p>
+        )}
+      </Card>
+      
+      {/* Apply similar changes to the Previous Workout card */}
+      <Card className="p-4">
+        <h3 className="text-lg font-semibold">Previous Workout</h3>
+        {lastWorkout ? (
+          <div>
+            <p className="text-gray-600 font-medium mt-2">
+              {new Date(lastWorkout.date).toLocaleDateString('en-US', {
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric'
+              })} - {lastWorkout.category}
+            </p>
+            <div className="mt-1">
+              {lastWorkout.exercises
+                .slice(0, showAllExercises ? undefined : MAX_VISIBLE_EXERCISES)
+                .map((exercise, index) => (
+                  <div key={index} className="text-sm text-gray-600 ml-2">
+                    • {exercise.name} 
+                    {exercise.sets && exercise.sets.length > 0 && (
+                      <span className="text-xs text-gray-500 ml-1">
+                        ({exercise.sets.length} {exercise.sets.length === 1 ? 'set' : 'sets'})
+                      </span>
+                    )}
+                  </div>
+              ))}
+              
+              {!showAllExercises && lastWorkout.exercises.length > MAX_VISIBLE_EXERCISES && (
+                <button 
+                  onClick={() => setShowAllExercises(true)}
+                  className="text-xs text-blue-600 hover:underline mt-1"
+                >
+                  Show {lastWorkout.exercises.length - MAX_VISIBLE_EXERCISES} more...
+                </button>
+              )}
+              
+              {showAllExercises && (
+                <button 
+                  onClick={() => setShowAllExercises(false)}
+                  className="text-xs text-blue-600 hover:underline mt-1"
+                >
+                  Show less
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-600 mt-2">No previous workouts found</p>
+        )}
+      </Card>
     </div>
   );
 };
