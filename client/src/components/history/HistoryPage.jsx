@@ -86,13 +86,11 @@ const ProgressChart = ({ data, targetWeight }) => {
               name = 'Weight';
               break;
             case 'nutrition.proteinPercentage':
-              const proteinData = entry.payload.nutrition;
-              valueDisplay = `${entry.value}% (${proteinData.protein}g/${proteinData.proteinGoal}g)`;
+              valueDisplay = `${entry.value}% of daily goal`;
               name = 'Protein';
               break;
             case 'nutrition.caloriesPercentage':
-              const calorieData = entry.payload.nutrition;
-              valueDisplay = `${entry.value}% (${calorieData.calories}/${calorieData.calorieGoal})`;
+              valueDisplay = `${entry.value}% of daily goal`;
               name = 'Calories';
               break;
             default:
