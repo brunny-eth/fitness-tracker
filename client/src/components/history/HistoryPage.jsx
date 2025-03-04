@@ -9,7 +9,9 @@ import {
   YAxis, 
   Tooltip, 
   ResponsiveContainer, 
-  Legend 
+  Legend,
+  ReferenceArea,
+  ReferenceLine
 } from 'recharts';
 
 
@@ -50,12 +52,13 @@ const SummaryCards = ({ startingPoint, currentStatus }) => {
   );
 };
 
-const ProgressChart = ({ data }) => {
+const ProgressChart = ({ data, targetWeight }) => {
   // Define consistent colors
   const colors = {
     weight: '#8884d8',    // Purple
-    protein: '#82ca9d',   // Green
-    calories: '#ffc658'   // Yellow
+    protein: '#22c55e',   // Green
+    calories: '#f59e0b',  // Amber/Yellow
+    targetWeight: '#9ca3af'  // Gray for target line
   };
 
   // Format date for chart display
@@ -64,6 +67,72 @@ const ProgressChart = ({ data }) => {
     const date = new Date(dateStr + 'T00:00:00.000Z');
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
+  
+  // Create custom tooltip to ensure percentages have % signs
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload || !payload.length) return null;
+    
+    return (
+      <div className="bg-white p-3 border border-gray-200 shadow-md rounded-md">
+        <p className="font-medium mb-1">{formatDate(label)}</p>
+        {payload.map((entry, index) => {
+          let valueDisplay = '';
+          let name = '';
+          
+          // Format based on the data type
+          switch(entry.dataKey) {
+            case 'weight':
+              valueDisplay = `${entry.value.toFixed(1)} kg`;
+              name = 'Weight';
+              break;
+            case 'nutrition.proteinPercentage':
+              const proteinData = entry.payload.nutrition;
+              valueDisplay = `${entry.value}% (${proteinData.protein}g/${proteinData.proteinGoal}g)`;
+              name = 'Protein';
+              break;
+            case 'nutrition.caloriesPercentage':
+              const calorieData = entry.payload.nutrition;
+              valueDisplay = `${entry.value}% (${calorieData.calories}/${calorieData.calorieGoal})`;
+              name = 'Calories';
+              break;
+            default:
+              valueDisplay = entry.value;
+              name = entry.name;
+          }
+          
+          return (
+            <div key={index} style={{ color: entry.color }} className="flex items-center">
+              <div className="w-2 h-2 rounded-full mr-1" style={{ backgroundColor: entry.color }}></div>
+              <span className="font-medium">{name}:</span> <span className="ml-1">{valueDisplay}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Transform data to add percentage calculations
+  const transformedData = data.map(day => {
+    // Calculate percentages for nutrition
+    const proteinPercentage = day.nutrition.proteinGoal > 0 
+      ? (day.nutrition.protein / day.nutrition.proteinGoal) * 100
+      : 0;
+    
+    const caloriesPercentage = day.nutrition.calorieGoal > 0 
+      ? (day.nutrition.calories / day.nutrition.calorieGoal) * 100
+      : 0;
+
+    return {
+      ...day,
+      nutrition: {
+        ...day.nutrition,
+        proteinPercentage: Math.round(proteinPercentage),
+        caloriesPercentage: Math.round(caloriesPercentage)
+      }
+    };
+  });
+
+  // Target weight is now passed as a prop
 
   return (
     <Card className="p-4 mb-6">
@@ -71,13 +140,25 @@ const ProgressChart = ({ data }) => {
       <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
-            data={data} 
+            data={transformedData} 
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
           >
             <XAxis 
               dataKey="date" 
               tickFormatter={formatDate}
               tick={{ fontSize: 12 }}
+            />
+            <YAxis 
+              yAxisId="percentage" 
+              orientation="left"
+              domain={[0, 200]}
+              label={{ 
+                value: 'Goal Percentage (%)', 
+                angle: -90, 
+                position: 'left',
+                offset: 0
+              }}
+              ticks={[0, 50, 100, 150, 200]}
             />
             <YAxis 
               yAxisId="weight" 
@@ -90,61 +171,68 @@ const ProgressChart = ({ data }) => {
                 offset: 0
               }}
             />
-            <YAxis 
-              yAxisId="nutrition" 
-              orientation="left"
-              domain={[0, 'dataMax + 20']}
-              label={{ 
-                value: 'Protein (g) / Calories', 
-                angle: -90, 
-                position: 'left',
-                offset: 0
-              }}
-            />
-            <Tooltip 
-              labelFormatter={value => {
-                // Display date in a more readable format
-                return formatDate(value);
-              }}
-              formatter={(value, name) => {
-                if (!value && value !== 0) return ['N/A', name];
-                switch (name) {
-                  case 'weight':
-                    return [`${value.toFixed(1)} kg`, 'Weight'];
-                  case 'protein':
-                    return [`${value}g`, 'Protein'];
-                  case 'calories':
-                    return [value, 'Calories'];
-                  default:
-                    return [value, name];
-                }
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} />
             <Legend verticalAlign="top" height={36} />
+            
+            {/* Reference line for 100% goal */}
+            <ReferenceLine 
+              yAxisId="percentage"
+              y={100}
+              stroke="#e5e7eb"
+              strokeWidth={1}
+              label={{
+                value: "100%",
+                position: "left",
+                fill: "#9ca3af",
+                fontSize: 11
+              }}
+            />
+            
+            {/* Target weight reference line (if available) */}
+            {targetWeight && (
+              <ReferenceLine
+                yAxisId="weight"
+                y={targetWeight}
+                label={{
+                  value: `Target: ${targetWeight}kg`,
+                  position: 'insideTopRight',
+                  fill: colors.targetWeight,
+                  fontSize: 12
+                }}
+                stroke={colors.targetWeight}
+                strokeDasharray="3 3"
+              />
+            )}
+            
+            {/* Weight line */}
             <Line 
               yAxisId="weight"
               type="monotone" 
               dataKey="weight" 
               stroke={colors.weight}
-              strokeWidth={2}
+              strokeWidth={2.5}
               dot={{ r: 3 }}
               name="Weight"
               connectNulls={true}
             />
+            
+            {/* Protein percentage line */}
             <Line 
-              yAxisId="nutrition"
+              yAxisId="percentage"
               type="monotone" 
-              dataKey="nutrition.protein" 
+              dataKey="nutrition.proteinPercentage" 
               stroke={colors.protein}
               strokeWidth={2}
               dot={{ r: 3 }}
               name="Protein"
               connectNulls={true}
             />
+            
+            {/* Calories percentage line */}
             <Line 
-              yAxisId="nutrition"
+              yAxisId="percentage"
               type="monotone" 
-              dataKey="nutrition.calories" 
+              dataKey="nutrition.caloriesPercentage" 
               stroke={colors.calories}
               strokeWidth={2}
               dot={{ r: 3 }}
@@ -153,6 +241,17 @@ const ProgressChart = ({ data }) => {
             />
           </LineChart>
         </ResponsiveContainer>
+      </div>
+      
+      <div className="flex justify-center mt-2 text-sm">
+        <div className="flex items-center mr-6">
+          <div className="w-3 h-3 rounded-full bg-green-500 mr-1"></div>
+          <span>Protein: Over 100% is good</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-amber-500 mr-1"></div>
+          <span>Calories: Under 100% is good</span>
+        </div>
       </div>
     </Card>
   );
@@ -341,7 +440,10 @@ const HistoryPage = () => {
         currentStatus={summary?.currentStatus}
       />
 
-      <ProgressChart data={historyData} />
+      <ProgressChart 
+        data={historyData} 
+        targetWeight={summary?.currentStatus?.targetWeight} 
+      />
 
       <div className="space-y-4">
         {[...entriesWithData].reverse().map((entry) => (
