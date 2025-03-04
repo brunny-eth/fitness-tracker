@@ -27,12 +27,12 @@ const SummaryCards = ({ startingPoint, currentStatus }) => {
       <Card className="p-4">
         <h3 className="text-lg font-semibold mb-2">Starting Point</h3>
         <div className="space-y-2">
-          <p>Starting weight: {startingPoint?.weight?.toFixed(1) || 'N/A'} kg</p>
-          <p>Initial goal: {startingPoint?.weightGoal === 'gain' ? 'Gain Weight' : 
+          <p><span className="font-semibold">Starting weight:</span> {startingPoint?.weight?.toFixed(1) || 'N/A'} kg</p>
+          <p><span className="font-semibold">Initial goal:</span> {startingPoint?.weightGoal === 'gain' ? 'Gain Weight' : 
             startingPoint?.weightGoal === 'lose' ? 'Lose Weight' : 'Maintain Weight'}</p>
-          <p>Target: {startingPoint?.muscleGoal === 'gain' ? 'Build Muscle' : 'Maintain Muscle'}</p>
+          <p><span className="font-semibold">Target:</span> {startingPoint?.muscleGoal === 'gain' ? 'Build Muscle' : 'Maintain Muscle'}</p>
           <p className="text-sm text-gray-500">
-            Started {formatDate(startingPoint?.startDate)}
+            <span className="font-semibold">Started</span> {formatDate(startingPoint?.startDate)}
           </p>
         </div>
       </Card>
@@ -40,11 +40,11 @@ const SummaryCards = ({ startingPoint, currentStatus }) => {
       <Card className="p-4">
         <h3 className="text-lg font-semibold mb-2">Current Status</h3>
         <div className="space-y-2">
-          <p>Current weight: {currentStatus?.weight?.toFixed(1) || 'N/A'} kg</p>
-          <p>Target weight: {currentStatus?.targetWeight?.toFixed(1) || 'N/A'} kg</p>
-          <p>Exercised {currentStatus?.workoutCount || 0} times in the last 30 days</p>
+          <p><span className="font-semibold">Current weight:</span> {currentStatus?.weight?.toFixed(1) || 'N/A'} kg</p>
+          <p><span className="font-semibold">Target weight:</span> {currentStatus?.targetWeight?.toFixed(1) || 'N/A'} kg</p>
+          <p><span className="font-semibold">Exercised</span> {currentStatus?.workoutCount || 0} times in the last 30 days</p>
           <p className="text-sm text-gray-500">
-            Last weighed: {formatDate(currentStatus?.lastUpdated)}
+            <span className="font-semibold">Last weighed:</span> {formatDate(currentStatus?.lastUpdated)}
           </p>
         </div>
       </Card>
@@ -240,16 +240,8 @@ const ProgressChart = ({ data, targetWeight }) => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      
-      <div className="flex justify-center mt-2 text-sm">
-        <div className="flex items-center mr-6">
-          <div className="w-3 h-3 rounded-full bg-green-500 mr-1"></div>
-          <span>Protein: Over 100% is good</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-3 h-3 rounded-full bg-amber-500 mr-1"></div>
-          <span>Calories: Under 100% is good</span>
-        </div>
+      <div className="text-center mt-2 text-s text-gray-500 italic">
+        Don't forget: protein should be above 100%; calories should be below 100%.
       </div>
     </Card>
   );
