@@ -179,7 +179,7 @@ const DailyEntry = ({ entry }) => {
         </h3>
         {entry.weight && (
           <span className="text-gray-500">
-            {entry.weight.toFixed(1)} kg
+            Weight: {entry.weight.toFixed(1)} kg
           </span>
         )}
       </div>
