@@ -255,8 +255,14 @@ const WorkoutCategories = ({ onSelectCategory }) => {
     e.preventDefault();
     try {
       setError(null);
+      
+      let finalCategoryName = newCategoryName.trim();
+      if (!finalCategoryName.toLowerCase().includes('day')) {
+        finalCategoryName += ' Day';
+      }
+      
       const newCategory = await api.post('/api/categories', { 
-        name: newCategoryName 
+        name: finalCategoryName
       });
       
       setCategories([...categories, newCategory]);
@@ -282,9 +288,9 @@ const WorkoutCategories = ({ onSelectCategory }) => {
   return (
     <Card className="p-4 mb-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Workout Categories</h3>
+        <h3 className="text-lg font-semibold">Workout Days</h3>
         <Button onClick={() => setIsAddingCategory(!isAddingCategory)}>
-          {isAddingCategory ? 'Cancel' : 'Add Category'}
+          {isAddingCategory ? 'Cancel' : 'Add Workout Day'}
         </Button>
       </div>
 
