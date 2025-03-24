@@ -25,13 +25,20 @@ if (!process.env.MONGODB_URI) {
 
 // Middleware
 app.use(cors({
-  origin: ['https://www.fitness-tracker.me', 'https://fitness-tracker.me'],
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Add explicit handling of OPTIONS requests
+app.options('*', cors());
+
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'API is running' });
+});
 
 // Request logging middleware
 app.use((req, res, next) => {
