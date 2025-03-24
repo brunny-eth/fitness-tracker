@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext(null);
+const API_URL = process.env.REACT_APP_API_URL || 'https://api.fitness-tracker.me';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
@@ -11,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, password) => {
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
