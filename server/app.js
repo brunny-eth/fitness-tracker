@@ -40,6 +40,13 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'API is running' });
 });
 
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ 
+    message: 'Test endpoint working', 
+    dbStatus: mongoose.connection.readyState 
+  });
+});
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);

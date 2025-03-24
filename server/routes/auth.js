@@ -10,6 +10,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // Register
 router.post('/register', async (req, res) => {
   try {
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ error: 'Database connection is not ready' });
+    }
+
     const { username, password } = req.body;
     
     // Validation
@@ -50,7 +55,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ error: 'Registration failed' });
   }
 });
 
