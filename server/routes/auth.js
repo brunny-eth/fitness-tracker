@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { auth } from '../middleware/auth.js';
 import User from '../models/user.js';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -55,7 +56,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    return res.status(500).json({ error: 'Registration failed' });
+    return res.status(500).json({ error: 'Registration failed: ' + error.message });
   }
 });
 
