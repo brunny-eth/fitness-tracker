@@ -1,65 +1,70 @@
 // src/utils/api.js
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://api.fitness-tracker.me';
 
 const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
   };
+};
   
-  const handleResponse = async (response) => {
-    if (response.status === 401) {
-      // Clear auth data and reload to trigger login redirect
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.reload();
-      throw new Error('Session expired. Please login again.');
-    }
+const handleResponse = async (response) => {
+  if (response.status === 401) {
+    // Clear auth data and reload to trigger login redirect
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.reload();
+    throw new Error('Session expired. Please login again.');
+  }
     
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Request failed');
-    }
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Request failed');
+  }
     
-    if (response.status === 204) {
-      return null;
-    }
+  if (response.status === 204) {
+    return null;
+  }
     
-    return response.json();
-  };
+  return response.json();
+};
   
-  export const api = {
-    get: async (url) => {
-      const response = await fetch(url, {
-        headers: getAuthHeaders()
-      });
-      return handleResponse(response);
-    },
+export const api = {
+  get: async (endpoint) => {
+    // Use BASE_URL here
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
   
-    post: async (url, data) => {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data)
-      });
-      return handleResponse(response);
-    },
+  post: async (endpoint, data) => {
+    // Use BASE_URL here
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
   
-    put: async (url, data) => {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data)
-      });
-      return handleResponse(response);
-    },
+  put: async (endpoint, data) => {
+    // Use BASE_URL here
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
   
-    delete: async (url) => {
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      return handleResponse(response);
-    }
-  };
+  delete: async (endpoint) => {
+    // Use BASE_URL here
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  }
+};
