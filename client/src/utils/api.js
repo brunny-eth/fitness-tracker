@@ -1,5 +1,5 @@
 // src/utils/api.js
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://api.fitness-tracker.me';
+const BASE_URL = 'https://api.fitness-tracker.me';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -11,7 +11,6 @@ const getAuthHeaders = () => {
   
 const handleResponse = async (response) => {
   if (response.status === 401) {
-    // Clear auth data and reload to trigger login redirect
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.reload();
