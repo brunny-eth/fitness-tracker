@@ -24,7 +24,13 @@ if (!process.env.MONGODB_URI) {
 }
 
 // Middleware
-app.use(cors());
+// Update this line in server/app.js
+app.use(cors({
+  origin: ['https://www.fitness-tracker.me', 'https://fitness-tracker.me'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Request logging middleware
