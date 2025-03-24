@@ -11,8 +11,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // Register
 router.post('/register', async (req, res) => {
   try {
-
+    console.log('Register request body:', req.body);
+    
     if (mongoose.connection.readyState !== 1) {
+      console.log('MongoDB connection state:', mongoose.connection.readyState);
       return res.status(500).json({ error: 'Database connection is not ready' });
     }
 

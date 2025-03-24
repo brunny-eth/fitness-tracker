@@ -5,16 +5,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    trim: true,
-    minLength: 3
+    trim: true
   },
   password: {
     type: String,
-    required: true,
-    minLength: 6
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
-}, {
-  timestamps: true
 });
 
-export default mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+export default User;
