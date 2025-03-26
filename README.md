@@ -1,4 +1,4 @@
-# FitnessTracker.Me
+# Fitness-Tracker.Me
 
 A web application for tracking your fitness and nutrition goals in one simple place. Built as a hobby project for personal use. 
 
