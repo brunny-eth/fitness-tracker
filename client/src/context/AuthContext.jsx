@@ -1,55 +1,64 @@
-import React, { createContext, useState, useContext } from 'react';
-const AuthContext = createContext(null);
-const API_URL = process.env.REACT_APP_API_URL || 'https://api.fitness-tracker.me';
+// File: client/src/context/AuthContext.jsx
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { api } from '../utils/api';
+
+const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    return token && savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = async (username, password) => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    
+    setLoading(false);
+  }, []);
+
+  // Updated to handle name and email for registration
+  const register = async (name, email, password) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+      const response = await api.post('/api/auth/register', {
+        name,
+        email,
+        password
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
+      localStorage.setItem('token', response.token);
       
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-      return data;
+      // Fetch user profile after registration
+      const userProfile = await api.get('/api/auth/me');
+      localStorage.setItem('user', JSON.stringify(userProfile));
+      setUser(userProfile);
+      
+      return userProfile;
     } catch (error) {
       throw error;
     }
   };
 
-  const register = async (username, password) => {
+  const login = async (email, password) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+      const response = await api.post('/api/auth/login', {
+        email,
+        password
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
+      localStorage.setItem('token', response.token);
       
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-      return data;
+      // Fetch user profile after login
+      const userProfile = await api.get('/api/auth/me');
+      localStorage.setItem('user', JSON.stringify(userProfile));
+      setUser(userProfile);
+      
+      return userProfile;
     } catch (error) {
       throw error;
     }
@@ -62,10 +71,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        register,
+        login,
+        logout,
+        isAuthenticated: !!user
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

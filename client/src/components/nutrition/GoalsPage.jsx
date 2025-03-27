@@ -15,7 +15,7 @@ const GoalsPage = () => {
     targetWeight: '',
     currentWeight: '',
     weeklyGoal: 0.5,
-    targetDate: ''
+    targetDate: new Date().toISOString().split('T')[0]
   });
   
   const [calculated, setCalculated] = useState({
@@ -39,8 +39,21 @@ const GoalsPage = () => {
     setLoading(true);
     try {
       const data = await api.get('/api/goals');
-      setGoals(data);
-      updateCalculations(data);
+      
+      // Fix for new users - set default values if data is empty or has empty fields
+      const goalsData = {
+        ...goals, // Start with default values
+        ...data,  // Override with any values from the API
+        
+        // Ensure we have values for all required fields
+        weightGoal: data.weightGoal || 'maintain',
+        muscleGoal: data.muscleGoal || 'maintain',
+        weeklyGoal: data.weeklyGoal || 0.5,
+        targetDate: data.targetDate || new Date().toISOString().split('T')[0]
+      };
+      
+      setGoals(goalsData);
+      updateCalculations(goalsData);
       
       // If we received default goals (empty values), mark as new user
       if (!data.currentWeight && !data.targetWeight) {
@@ -51,8 +64,14 @@ const GoalsPage = () => {
       
       setError(''); // Clear any errors
     } catch (err) {
+      console.error('Error fetching goals:', err);
       // Only set error for actual server errors, not for new users
-      setError('Problem connecting to server. Please try again later.');
+      if (err.message !== 'Request failed' && err.message !== 'Session expired. Please login again.') {
+        setError('Problem connecting to server. Please try again later.');
+      } else {
+        // Handle new user case
+        setIsNewUser(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -95,17 +114,34 @@ const GoalsPage = () => {
     e.preventDefault();
     if (!user) return;
     
+    // Validate required fields for the goals model
+    if (!goals.currentWeight || !goals.targetWeight) {
+      setError('Please enter your current weight and target weight');
+      return;
+    }
+    
     setLoading(true);
     setError('');
     setSuccessMessage('');
 
     try {
-      const savedGoals = await api.post('/api/goals', {
+      // Make sure weightGoal is properly set based on target vs current
+      let weightGoal = 'maintain';
+      if (goals.targetWeight > goals.currentWeight) {
+        weightGoal = 'gain';
+      } else if (goals.targetWeight < goals.currentWeight) {
+        weightGoal = 'lose';
+      }
+      
+      const goalsToSave = {
         ...goals,
+        weightGoal,
         targetDate: calculated.targetDate === 'maintain' 
           ? new Date().toISOString() 
           : calculated.targetDate
-      });
+      };
+      
+      const savedGoals = await api.post('/api/goals', goalsToSave);
       
       setGoals(savedGoals);
       setSuccessMessage('Goals saved successfully!');
@@ -114,6 +150,7 @@ const GoalsPage = () => {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
+      console.error('Error saving goals:', err);
       setError('Failed to save goals. Please try again.');
     } finally {
       setLoading(false);
@@ -142,7 +179,7 @@ const GoalsPage = () => {
         </Card>
       )}
       
-      {error && !isNewUser && (
+      {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
@@ -296,7 +333,7 @@ const GoalsPage = () => {
           
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || !goals.currentWeight || !goals.targetWeight}
             isLoading={loading}
           >
             <Save className="w-4 h-4 mr-2" />

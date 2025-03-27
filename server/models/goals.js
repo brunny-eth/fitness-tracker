@@ -4,18 +4,17 @@ const goalsSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',
-    // Making it optional
-    required: false
+    required: true
   },
   weightGoal: {
     type: String,
     enum: ['gain', 'lose', 'maintain'],
-    default: 'maintain'  // Adding default
+    default: 'maintain'
   },
   muscleGoal: {
     type: String,
     enum: ['gain', 'maintain'],
-    required: true
+    default: 'maintain'
   },
   targetWeight: {
     type: Number,
@@ -27,15 +26,15 @@ const goalsSchema = new mongoose.Schema({
   },
   weeklyGoal: {
     type: Number,  // in kg
-    required: true
+    default: 0.5
   },
   proteinTarget: {
     type: Number,  // in grams
-    required: true
+    default: 0
   },
   calorieTarget: {
     type: Number,
-    required: true
+    default: 0
   },
   startDate: {
     type: Date,
@@ -43,7 +42,7 @@ const goalsSchema = new mongoose.Schema({
   },
   targetDate: {
     type: Date,
-    required: true
+    default: Date.now
   }
 }, {
   timestamps: true,
@@ -51,7 +50,7 @@ const goalsSchema = new mongoose.Schema({
     calculateNutritionTargets() {     
       // Adjust protein target based on muscle goals (1.2-2.0g per kg)
       const proteinMultiplier = this.muscleGoal === 'gain' ? 2.0 : 1.2;
-      this.proteinTarget = Math.round(this.targetWeight * proteinMultiplier);
+      this.proteinTarget = Math.round(this.currentWeight * proteinMultiplier);
       
       // Base metabolic rate (BMR) calculation remains the same
       const bmr = (10 * this.currentWeight) + 625;
