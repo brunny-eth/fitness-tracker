@@ -12,10 +12,10 @@ router.post('/register', async (req, res) => {
   try {
     console.log('Register request received:', req.body);
     
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
     // Basic validation
-    if (!name || !email || !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
@@ -27,7 +27,6 @@ router.post('/register', async (req, res) => {
 
     // Create new user
     user = new User({
-      name,
       email,
       password
     });

@@ -22,11 +22,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Updated to handle name and email for registration
-  const register = async (name, email, password) => {
+  // Simplified to just email and password
+  const register = async (email, password) => {
     try {
       const response = await api.post('/api/auth/register', {
-        name,
         email,
         password
       });

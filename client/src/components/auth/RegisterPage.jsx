@@ -8,7 +8,6 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
 const RegisterPage = () => {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +21,7 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     try {
-      await register(name, email, password);
+      await register(email, password);
       navigate('/goals');
     } catch (err) {
       setError(err.message);
@@ -43,18 +42,6 @@ const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              minLength={3}
-            />
-          </div>
-
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
