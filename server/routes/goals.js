@@ -13,7 +13,15 @@ router.get('/', auth, async (req, res) => {
     }).sort({ createdAt: -1 });
     
     if (!goals) {
-      return res.status(404).json({ message: 'No goals found' });
+      // For new users: return 200 with empty defaults instead of 404
+      return res.json({
+        weightGoal: 'maintain',
+        muscleGoal: 'maintain',
+        currentWeight: '',
+        targetWeight: '',
+        weeklyGoal: 0.5,
+        targetDate: new Date().toISOString()
+      });
     }
     
     res.json(goals);

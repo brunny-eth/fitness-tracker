@@ -24,7 +24,7 @@ const GoalsPage = () => {
     duration: 0
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -36,35 +36,39 @@ const GoalsPage = () => {
   }, [user]);
 
   const fetchCurrentGoals = async () => {
+    setLoading(true);
     try {
       const data = await api.get('/api/goals');
       setGoals(data);
       updateCalculations(data);
-      setIsNewUser(false);
-      setError(''); 
-    } catch (err) {
-      if (err.message.includes('404') || err.message.includes('not found')) {
+      
+      // If we received default goals (empty values), mark as new user
+      if (!data.currentWeight && !data.targetWeight) {
         setIsNewUser(true);
-        setError(''); 
-        
-        // Set default values for a new user
-        const defaultGoals = {
-          weightGoal: 'maintain',
-          muscleGoal: 'maintain',
-          targetWeight: '',
-          currentWeight: '',
-          weeklyGoal: 0.5,
-          targetDate: ''
-        };
-        setGoals(defaultGoals);
       } else {
-        setError('Failed to load goals');
         setIsNewUser(false);
       }
+      
+      setError(''); // Clear any errors
+    } catch (err) {
+      // Only set error for actual server errors, not for new users
+      setError('Problem connecting to server. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const updateCalculations = (currentGoals) => {
+    // Skip calculations if input values are empty
+    if (!currentGoals.currentWeight || !currentGoals.targetWeight) {
+      setCalculated({
+        duration: 0,
+        targetDate: 'maintain',
+        message: "Please enter your current and target weight to see your timeline."
+      });
+      return;
+    }
+    
     const weightDiff = Math.abs(currentGoals.targetWeight - currentGoals.currentWeight);
     
     if (weightDiff === 0) {
@@ -110,11 +114,15 @@ const GoalsPage = () => {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      setError(err.message);
+      setError('Failed to save goals. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (loading && !isNewUser) {
+    return <div className="max-w-2xl mx-auto p-4">Loading your fitness goals...</div>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-4">
@@ -124,15 +132,17 @@ const GoalsPage = () => {
         <Card className="mb-6 bg-blue-50">
           <div className="p-6">
             <p className="text-gray-700 leading-relaxed">
-              FitnessTracker.Me makes it simple to get started by just setting a few high-level goals - we don't want to overthink the process.
+              <span className="font-bold">Welcome to FitnessTracker.Me!</span> Let's get started by setting up your fitness goals.
               <br /><br />
-              Start by setting these weight goals and a timeline, and your nutrition needs will change based on your daily updated weight and your goals. You can always change your goals in the future.
+              Simply provide your current weight, target weight, and how quickly you'd like to reach your goal. We'll calculate a personalized plan based on your inputs.
+              <br /><br />
+              Your nutrition needs will update automatically based on your progress and goals. You can always change these settings later.
             </p>
           </div>
         </Card>
       )}
       
-      {error && (
+      {error && !isNewUser && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
