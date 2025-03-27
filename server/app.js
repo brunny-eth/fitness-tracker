@@ -23,11 +23,14 @@ if (!process.env.MONGODB_URI) {
   process.exit(1);
 }
 
-// Middleware
+// In your server/app.js file
+const cors = require('cors');
+
+// Add CORS middleware with proper configuration
 app.use(cors({
-  origin: '*',
+  origin: ['http://localhost:3000', 'https://fitness-tracker.me', 'https://www.fitness-tracker.me'],
+  credentials: true, // If you're using cookies or authentication
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
