@@ -12,6 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 router.post('/register', async (req, res) => {
   try {
     console.log('Register request body:', req.body);
+    console.log('MongoDB connection state:', mongoose.connection.readyState);
     
     if (mongoose.connection.readyState !== 1) {
       console.log('MongoDB connection state:', mongoose.connection.readyState);
@@ -58,6 +59,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
+    console.error('Error stack:', error.stack);  
     return res.status(500).json({ error: 'Registration failed: ' + error.message });
   }
 });

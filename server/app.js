@@ -23,9 +23,6 @@ if (!process.env.MONGODB_URI) {
   process.exit(1);
 }
 
-// In your server/app.js file
-const cors = require('cors');
-
 // Add CORS middleware with proper configuration
 app.use(cors({
   origin: ['http://localhost:3000', 'https://fitness-tracker.me', 'https://www.fitness-tracker.me'],
@@ -48,6 +45,11 @@ app.get('/api/test', (req, res) => {
     message: 'Test endpoint working', 
     dbStatus: mongoose.connection.readyState 
   });
+});
+
+// Add this to your app.js, before your routes
+app.get('/api/cors-test', (req, res) => {
+  res.status(200).json({ message: 'CORS is working!' });
 });
 
 // Request logging middleware
