@@ -41,10 +41,22 @@ const GoalsPage = () => {
       setGoals(data);
       updateCalculations(data);
       setIsNewUser(false);
+      setError(''); 
     } catch (err) {
-      // If the error is 404, this is likely a new user
       if (err.message.includes('404') || err.message.includes('not found')) {
         setIsNewUser(true);
+        setError(''); 
+        
+        // Set default values for a new user
+        const defaultGoals = {
+          weightGoal: 'maintain',
+          muscleGoal: 'maintain',
+          targetWeight: '',
+          currentWeight: '',
+          weeklyGoal: 0.5,
+          targetDate: ''
+        };
+        setGoals(defaultGoals);
       } else {
         setError('Failed to load goals');
         setIsNewUser(false);
