@@ -13,16 +13,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is already logged in
     const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
     
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (token) {
+      // Fetch current user data if token exists
+      const fetchUser = async () => {
+        try {
+          const userData = await api.get('/api/auth/me');
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+        } catch (error) {
+          console.error('Failed to fetch user data:', error);
+          // Clear invalid token
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchUser();
+    } else {
+      setLoading(false);
     }
-    
-    setLoading(false);
   }, []);
 
-  // Simplified to just email and password
   const register = async (email, password) => {
     try {
       const response = await api.post('/api/auth/register', {
@@ -52,15 +66,22 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('token', response.token);
       
-      const userObj = { email };
-      localStorage.setItem('user', JSON.stringify(userObj));
-      setUser(userObj);
+      // Fetch user data after successful login
+      const userData = await api.get('/api/auth/me');
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
       
-      return userObj;
+      return userData;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
     }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   return (

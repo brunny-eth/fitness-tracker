@@ -14,7 +14,7 @@ export const auth = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Find user
+    // Find user 
     const user = await User.findOne({ _id: decoded.id });
     
     if (!user) {

@@ -41,9 +41,7 @@ router.post('/register', async (req, res) => {
 
     // Create and return JWT token
     const payload = {
-      user: {
-        _id: user._id
-      }
+      id: user._id
     };
 
     jwt.sign(
@@ -74,8 +72,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    // Check if user exists
-    const user = await User.findOne({ username: email });
+    // Check if user exists - FIXED: looking for email field instead of username
+    const user = await User.findOne({ email });
     if (!user) {
       console.log('User not found with email:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -96,9 +94,7 @@ router.post('/login', async (req, res) => {
     // Create and return JWT token
     console.log('Creating token for user:', user._id.toString());
     const payload = {
-      user: {
-        _id: user._id
-      }
+      id: user._id
     };
 
     jwt.sign(
