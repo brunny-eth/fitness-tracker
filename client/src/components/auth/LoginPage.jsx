@@ -47,7 +47,7 @@ const LoginPage = () => {
             <Input
               id="email"
               type="email"
-              value={username}
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               minLength={3}

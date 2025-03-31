@@ -39,15 +39,23 @@ export const api = {
   },
   
   post: async (endpoint, data) => {
-    console.log(`Making POST request to ${BASE_URL}${endpoint}`, data);
     try {
+      console.log(`Making POST request to ${BASE_URL}${endpoint}`, data);
+      
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
       });
+      
       console.log('Response status:', response.status);
-      const result = await handleResponse(response);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Request failed');
+      }
+      
+      const result = await response.json();
       console.log('Response data:', result);
       return result;
     } catch (error) {

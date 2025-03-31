@@ -52,18 +52,11 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('token', response.token);
       
-      setTimeout(async () => {
-        try {
-          const userProfile = await api.get('/api/auth/me');
-          localStorage.setItem('user', JSON.stringify(userProfile));
-          setUser(userProfile);
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
-        }
-      }, 500);
+      const userObj = { email };
+      localStorage.setItem('user', JSON.stringify(userObj));
+      setUser(userObj);
       
-      // Return a basic user object to prevent UI issues
-      return { email };
+      return userObj;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
