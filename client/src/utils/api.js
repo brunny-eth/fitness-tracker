@@ -39,13 +39,21 @@ export const api = {
   },
   
   post: async (endpoint, data) => {
-    // Use BASE_URL here
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    });
-    return handleResponse(response);
+    console.log(`Making POST request to ${BASE_URL}${endpoint}`, data);
+    try {
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      console.log('Response status:', response.status);
+      const result = await handleResponse(response);
+      console.log('Response data:', result);
+      return result;
+    } catch (error) {
+      console.error('API error:', error);
+      throw error;
+    }
   },
   
   put: async (endpoint, data) => {
