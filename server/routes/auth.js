@@ -64,21 +64,37 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
+    console.log('Login request received:', req.body);
+    
     const { email, password } = req.body;
+
+    // Basic validation
+    if (!email || !password) {
+      console.log('Missing email or password');
+      return res.status(400).json({ message: 'Please provide email and password' });
+    }
 
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found with email:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    console.log('User found:', user._id.toString());
+    
     // Verify password
+    console.log('Attempting password verification');
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match result:', isMatch);
+    
     if (!isMatch) {
+      console.log('Password mismatch for user:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Create and return JWT token
+    console.log('Creating token for user:', user._id.toString());
     const payload = {
       user: {
         _id: user._id
@@ -90,7 +106,11 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT sign error:', err);
+          throw err;
+        }
+        console.log('Token created successfully');
         res.json({ token });
       }
     );
