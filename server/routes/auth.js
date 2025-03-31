@@ -75,7 +75,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Check if user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username: email });
     if (!user) {
       console.log('User not found with email:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
