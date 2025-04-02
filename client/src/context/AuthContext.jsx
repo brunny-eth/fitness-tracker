@@ -1,4 +1,4 @@
-// File: client/src/context/AuthContext.jsx
+// client/src/context/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '../utils/api';
 
@@ -84,6 +84,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUserData = (newData) => {
+    setUser(newData);
+    localStorage.setItem('user', JSON.stringify(newData));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -92,6 +97,7 @@ export const AuthProvider = ({ children }) => {
         register,
         login,
         logout,
+        updateUserData, 
         isAuthenticated: !!user
       }}
     >

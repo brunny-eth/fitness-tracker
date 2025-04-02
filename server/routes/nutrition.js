@@ -5,8 +5,29 @@ import { analyzeMeal } from '../services/mealAnalysis.js';
 import Meal from '../models/meal.js';
 import Goals from '../models/goals.js';
 import Weight from '../models/weight.js';
+import User from '../models/user.js';
 
 const router = express.Router();
+
+// Helper function to get date range in user's timezone
+const getDateRangeInTimezone = (timezone = 'UTC') => {
+  // Current date
+  const now = new Date();
+  
+  // Create date with time set to 00:00:00 in user's timezone
+  const startOfDay = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  // Create date with time set to 23:59:59 in user's timezone
+  const endOfDay = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  // Convert back to UTC for database queries
+  const startOfDayUTC = new Date(startOfDay.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const endOfDayUTC = new Date(endOfDay.toLocaleString('en-US', { timeZone: 'UTC' }));
+  
+  return { startOfDayUTC, endOfDayUTC };
+};
 
 // Analyze a meal description
 router.post('/analyze', auth, async (req, res) => {
@@ -33,12 +54,16 @@ router.post('/analyze', auth, async (req, res) => {
 // Get today's meal log
 router.get('/log', auth, async (req, res) => {
   try {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    // Get user with timezone info
+    const user = await User.findById(req.user._id);
+    const timezone = user.timezone || 'UTC';
+    
+    // Get date range in user's timezone
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(timezone);
 
     const meals = await Meal.find({
       userId: req.user._id,
-      date: { $gte: startOfDay },
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
       isSaved: false
     }).sort('date');
 
@@ -128,12 +153,16 @@ router.delete('/saved-meal/:id', auth, async (req, res) => {
 // Get nutrition stats for today
 router.get('/stats', auth, async (req, res) => {
   try {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    // Get user with timezone info
+    const user = await User.findById(req.user._id);
+    const timezone = user.timezone || 'UTC';
+    
+    // Get date range in user's timezone
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(timezone);
 
     const meals = await Meal.find({
       userId: req.user._id,
-      date: { $gte: startOfDay },
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
       isSaved: false
     });
 
@@ -198,6 +227,74 @@ router.get('/weight/history', auth, async (req, res) => {
     res.json(weights);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch weight history' });
+  }
+});
+
+// Add to server/routes/nutrition.js
+
+// Get meals for a specific date
+router.get('/log/date/:date', auth, async (req, res) => {
+  try {
+    const dateParam = req.params.date; // Expected format: YYYY-MM-DD
+    
+    // Get user with timezone info
+    const user = await User.findById(req.user._id);
+    const timezone = user?.timezone || 'UTC';
+    
+    // Validate the date format
+    const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(dateParam);
+    if (!isValidDate) {
+      return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+    }
+    
+    // Create date range for the requested day in user's timezone
+    // Uses helper function to account for timezone differences
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateParam, timezone);
+
+    console.log('Fetching meals between:', startOfDayUTC, 'and', endOfDayUTC);
+
+    const meals = await Meal.find({
+      userId: req.user._id,
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
+      isSaved: false
+    }).sort('date');
+
+    console.log(`Found ${meals.length} meals for date ${dateParam}`);
+    res.json(meals);
+  } catch (error) {
+    console.error('Error fetching meals for date:', error);
+    res.status(500).json({ error: 'Failed to fetch meals for date' });
+  }
+});
+
+// Update a meal entry
+router.put('/log/:id', auth, async (req, res) => {
+  try {
+    const { name, protein, calories, details } = req.body;
+    
+    const updatedMeal = await Meal.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        userId: req.user._id
+      },
+      {
+        $set: {
+          name: name,
+          protein: protein,
+          calories: calories,
+          details: details
+        }
+      },
+      { new: true }
+    );
+    
+    if (!updatedMeal) {
+      return res.status(404).json({ error: 'Meal not found' });
+    }
+    
+    res.json(updatedMeal);
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to update meal' });
   }
 });
 

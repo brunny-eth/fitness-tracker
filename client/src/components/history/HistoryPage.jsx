@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import { 
   LineChart, 
   Line, 
@@ -247,8 +249,12 @@ const ProgressChart = ({ data, targetWeight }) => {
   );
 };
 
-const DailyEntry = ({ entry }) => {
+const DailyEntry = ({ entry, onUpdate }) => {
   const [showWorkouts, setShowWorkouts] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProtein, setEditedProtein] = useState(entry.nutrition.protein);
+  const [editedCalories, setEditedCalories] = useState(entry.nutrition.calories);
+  const [isSaving, setIsSaving] = useState(false);
 
   const workoutCount = entry.workouts?.length || 0;
   const workoutLabel = workoutCount === 1 ? "Workout" : "Workouts";
@@ -260,44 +266,163 @@ const DailyEntry = ({ entry }) => {
     return new Date(dateString + 'T00:00:00.000Z').toLocaleDateString();
   };
 
+// Updated handleSave and handleCancel functions in DailyEntry component
+const handleCancel = () => {
+  setEditedProtein(entry.nutrition.protein);
+  setEditedCalories(entry.nutrition.calories);
+  setIsEditing(false);
+};
+
+const handleSave = async () => {
+  try {
+    setIsSaving(true);
+    
+    // Step 1: Get all today's entries to find out what's already logged
+    const todayEntries = await api.get('/api/nutrition/log');
+    console.log('All today entries:', todayEntries);
+    
+    // Step 2: Calculate totals from entries that aren't manual
+    const nonManualEntries = todayEntries.filter(meal => 
+      meal.name !== "Manual Entry" && meal.name !== "Manual Adjustment"
+    );
+    
+    const manualEntries = todayEntries.filter(meal => 
+      meal.name === "Manual Entry" || meal.name === "Manual Adjustment"
+    );
+    
+    // Step 3: Delete all manual entries
+    for (const meal of manualEntries) {
+      await api.delete(`/api/nutrition/log/${meal._id}`);
+    }
+    
+    // Step 4: Calculate non-manual totals
+    const nonManualTotals = nonManualEntries.reduce(
+      (acc, meal) => ({
+        protein: acc.protein + meal.protein,
+        calories: acc.calories + meal.calories
+      }),
+      { protein: 0, calories: 0 }
+    );
+    
+    // Step 5: Calculate the DIFFERENCE needed to reach edited values
+    const proteinNeeded = editedProtein - nonManualTotals.protein;
+    const caloriesNeeded = editedCalories - nonManualTotals.calories;
+    
+    console.log(`Non-manual totals: protein=${nonManualTotals.protein}g, calories=${nonManualTotals.calories}`);
+    console.log(`Needed adjustment: protein=${proteinNeeded}g, calories=${caloriesNeeded}`);
+    
+    // Step 6: Add a manual entry with just the DIFFERENCE
+    if (proteinNeeded !== 0 || caloriesNeeded !== 0) {
+      await api.post('/api/nutrition/log', {
+        name: "Manual Adjustment",
+        protein: proteinNeeded,
+        calories: caloriesNeeded,
+        date: new Date(entry.date)
+      });
+    }
+    
+    // Call the parent component's update function with the new values
+    onUpdate(entry.date, {
+      protein: editedProtein,
+      calories: editedCalories
+    });
+    
+    setIsEditing(false);
+  } catch (error) {
+    console.error('Error saving nutrition data:', error);
+    alert('Failed to save changes. Please try again.');
+  } finally {
+    setIsSaving(false);
+  }
+};
+
   return (
     <Card className="p-4 mb-4">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-lg font-semibold">
           {formatDate(entry.date)}
         </h3>
-        {entry.weight && (
-          <span className="text-gray-500">
-            Weight: {entry.weight.toFixed(1)} kg
-          </span>
-        )}
+        <div className="flex items-center">
+          {entry.weight && (
+            <span className="text-gray-500 mr-3">
+              Weight: {entry.weight.toFixed(1)} kg
+            </span>
+          )}
+          <Button 
+            onClick={() => setIsEditing(!isEditing)}
+            variant="outline"
+            size="sm"
+          >
+            {isEditing ? 'Cancel' : 'Edit'}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span>Protein</span>
-            <span className={
-              entry.nutrition.protein >= entry.nutrition.proteinGoal 
-                ? 'text-green-600 font-semibold' 
-                : ''
-            }>
-              {entry.nutrition.protein}g / {entry.nutrition.proteinGoal}g
-            </span>
+        {isEditing ? (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="font-medium">Protein (g):</label>
+                <Input
+                  type="number"
+                  value={editedProtein}
+                  onChange={(e) => setEditedProtein(Number(e.target.value))}
+                  className="w-24 text-right"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="font-medium">Calories:</label>
+                <Input
+                  type="number"
+                  value={editedCalories}
+                  onChange={(e) => setEditedCalories(Number(e.target.value))}
+                  className="w-24 text-right"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button 
+                onClick={handleCancel}
+                variant="outline"
+                disabled={isSaving}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSave}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span>Calories</span>
-            <span className={
-              entry.nutrition.calories <= entry.nutrition.calorieGoal 
-                ? 'text-green-600 font-semibold' 
-                : entry.nutrition.calories > 0 
-                  ? 'text-red-600 font-semibold'
+        ) : (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span>Protein</span>
+              <span className={
+                entry.nutrition.protein >= entry.nutrition.proteinGoal 
+                  ? 'text-green-600 font-semibold' 
                   : ''
-            }>
-              {entry.nutrition.calories} / {entry.nutrition.calorieGoal}
-            </span>
+              }>
+                {entry.nutrition.protein}g / {entry.nutrition.proteinGoal}g
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span>Calories</span>
+              <span className={
+                entry.nutrition.calories <= entry.nutrition.calorieGoal 
+                  ? 'text-green-600 font-semibold' 
+                  : entry.nutrition.calories > 0 
+                    ? 'text-red-600 font-semibold'
+                    : ''
+              }>
+                {entry.nutrition.calories} / {entry.nutrition.calorieGoal}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {workoutCount > 0 && (
           <div>
@@ -388,6 +513,29 @@ const HistoryPage = () => {
     }
   };
 
+  // Function to handle updates to nutrition data
+  const handleNutritionUpdate = (date, updatedNutrition) => {
+    // Update the local state
+    setHistoryData(prevData => 
+      prevData.map(entry => {
+        if (entry.date === date) {
+          return {
+            ...entry,
+            nutrition: {
+              ...entry.nutrition,
+              protein: updatedNutrition.protein,
+              calories: updatedNutrition.calories
+            }
+          };
+        }
+        return entry;
+      })
+    );
+    
+    // Refresh data from server
+    fetchData();
+  };
+
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto p-4">
@@ -437,7 +585,11 @@ const HistoryPage = () => {
 
       <div className="space-y-4">
         {[...entriesWithData].reverse().map((entry) => (
-          <DailyEntry key={entry.date} entry={entry} />
+          <DailyEntry 
+            key={entry.date} 
+            entry={entry} 
+            onUpdate={handleNutritionUpdate}
+          />
         ))}
       </div>
     </div>

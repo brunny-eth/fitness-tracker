@@ -1,117 +1,68 @@
 // client/src/components/ui/TimeZoneSelector.jsx
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useState, useEffect } from 'react';
 import { api } from '../../utils/api';
-import { Card } from './card';
-import { Button } from './button';
+import { useAuth } from '../../context/AuthContext';
 import { Label } from './label';
 
-const TimeZoneSelector = () => {
-  const { user, updateUser } = useAuth();
-  const [selectedTimezone, setSelectedTimezone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+export const TimeZoneSelector = () => {
+  const [timezone, setTimezone] = useState('');
+  const [saving, setSaving] = useState(false);
+  const { user, updateUserData } = useAuth();
 
-  // Common time zones - you can expand this list
-  const timezones = [
-    { value: 'America/New_York', label: 'Eastern Time (ET)' },
-    { value: 'America/Chicago', label: 'Central Time (CT)' },
-    { value: 'America/Denver', label: 'Mountain Time (MT)' },
-    { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-    { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
-    { value: 'Europe/London', label: 'GMT/BST (UK)' },
-    { value: 'Europe/Paris', label: 'CET (Central European Time)' },
-    { value: 'Asia/Tokyo', label: 'JST (Japan)' },
-    { value: 'Australia/Sydney', label: 'AEST (Eastern Australia)' }
-  ];
-
+  // Get the current timezone on component mount
   useEffect(() => {
-    // Set the initial value based on the user's current setting
-    if (user && user.timezone) {
-      setSelectedTimezone(user.timezone);
-    } else {
-      // Try to get the browser's time zone as a default
-      try {
-        const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        setSelectedTimezone(browserTimezone);
-      } catch (e) {
-        // Fallback to a common timezone if browser detection fails
-        setSelectedTimezone('America/New_York');
-      }
-    }
+    // Set to browser's timezone by default
+    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setTimezone(user?.timezone || browserTimezone);
   }, [user]);
 
-  const handleSaveTimeZone = async () => {
-    if (!selectedTimezone) return;
-    
-    setLoading(true);
-    setError('');
-    setSuccess(false);
+  const handleTimezoneChange = async (e) => {
+    const newTimezone = e.target.value;
+    setTimezone(newTimezone);
+    setSaving(true);
     
     try {
-      const response = await api.post('/api/user/timezone', { timezone: selectedTimezone });
+      // Save the timezone preference to the server
+      const updatedUser = await api.post('/api/user/timezone', { timezone: newTimezone });
       
-      // If your auth context has a method to update the user locally, use it
-      if (updateUser) {
-        updateUser({ ...user, timezone: selectedTimezone });
+      // Update the user context
+      if (updateUserData) {
+        updateUserData({ ...user, timezone: newTimezone });
       }
       
-      setSuccess(true);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      console.error('Error setting timezone:', err);
-      setError('Failed to update time zone. Please try again.');
+      // Show success feedback
+      alert('Timezone updated successfully!');
+    } catch (error) {
+      console.error('Failed to update timezone:', error);
+      alert('Failed to update timezone. Please try again.');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   return (
-    <Card className="p-4">
-      <h3 className="text-lg font-semibold mb-2">Time Zone Setting</h3>
-      <p className="text-sm text-gray-500 mb-4">
-        Set your local time zone to ensure your daily tracking aligns with your day.
-      </p>
-      
-      {error && (
-        <div className="mb-4 p-2 bg-red-50 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-      
-      {success && (
-        <div className="mb-4 p-2 bg-green-50 text-green-700 rounded">
-          Time zone updated successfully!
-        </div>
-      )}
-      
-      <div className="mb-4">
-        <Label htmlFor="timezone">Your Time Zone</Label>
-        <select
-          id="timezone"
-          value={selectedTimezone}
-          onChange={(e) => setSelectedTimezone(e.target.value)}
-          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          {timezones.map((tz) => (
-            <option key={tz.value} value={tz.value}>
-              {tz.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <Button 
-        onClick={handleSaveTimeZone} 
-        disabled={loading || !selectedTimezone}
+    <div className="mb-4">
+      <Label htmlFor="timezone" className="block mb-2">Your Timezone</Label>
+      <select
+        id="timezone"
+        value={timezone}
+        onChange={handleTimezoneChange}
+        className="w-full p-2 border rounded"
+        disabled={saving}
       >
-        {loading ? 'Saving...' : 'Save Time Zone'}
-      </Button>
-    </Card>
+        <option value="UTC">UTC (Coordinated Universal Time)</option>
+        <option value="America/New_York">Eastern Time (US & Canada)</option>
+        <option value="America/Chicago">Central Time (US & Canada)</option>
+        <option value="America/Denver">Mountain Time (US & Canada)</option>
+        <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+        <option value="America/Anchorage">Alaska (US)</option>
+        <option value="Pacific/Honolulu">Hawaii (US)</option>
+        <option value="Europe/London">London, Edinburgh</option>
+        <option value="Europe/Paris">Paris, Berlin, Rome, Madrid</option>
+        <option value="Asia/Tokyo">Tokyo, Seoul</option>
+        <option value="Australia/Sydney">Sydney, Melbourne</option>
+      </select>
+      {saving && <p className="text-sm text-gray-500 mt-1">Saving...</p>}
+    </div>
   );
 };
-
-export default TimeZoneSelector;

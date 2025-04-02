@@ -1,7 +1,7 @@
 // server/routes/user.js
 import express from 'express';
 import User from '../models/user.js';
-import auth from '../middleware/auth.js';
+import { auth } from '../middleware/auth.js'; 
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post('/timezone', auth, async (req, res) => {
     
     // Update the user's timezone in the database
     const user = await User.findByIdAndUpdate(
-      req.user.id,
+      req.user._id,
       { timezone },
       { new: true, select: '-password' } // Return updated user without password
     );

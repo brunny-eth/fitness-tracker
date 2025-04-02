@@ -1,228 +1,242 @@
-// server/routes/history.js - Fixed summary endpoint
+// server/routes/history.js
 import express from 'express';
 import { auth } from '../middleware/auth.js';
 import Meal from '../models/meal.js';
-import Workout from '../models/workout.js';
 import Weight from '../models/weight.js';
+import Workout from '../models/workout.js';
 import Goals from '../models/goals.js';
 import User from '../models/user.js';
 
 const router = express.Router();
 
-// Helper function for consistent date string conversion - defined at the module level
-const getDateString = (date) => {
-  const d = new Date(date);
-  return d.toISOString().split('T')[0];
+// Helper function to get date range in user's timezone
+const getDateRangeInTimezone = (dateString, timezone = 'UTC') => {
+  // Parse the date from the input string (YYYY-MM-DD)
+  const date = dateString ? new Date(dateString) : new Date();
+  
+  // Create date with time set to 00:00:00 in user's timezone
+  const startOfDay = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  // Create date with time set to 23:59:59 in user's timezone
+  const endOfDay = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  // Convert back to UTC for database queries
+  const startOfDayUTC = new Date(startOfDay.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const endOfDayUTC = new Date(endOfDay.toLocaleString('en-US', { timeZone: 'UTC' }));
+  
+  return { startOfDayUTC, endOfDayUTC };
 };
 
-router.get('/stats', auth, async (req, res) => {
-  try {
-    const endDate = new Date();
-    endDate.setHours(23, 59, 59, 999); // End of current day in user's timezone
-    
-    // Get user info to check creation date
-    const user = await User.findById(req.user._id);
-    
-    // Use either user creation date or 30 days ago, whichever is more recent
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    thirtyDaysAgo.setHours(0, 0, 0, 0); // Start of day 30 days ago
-    
-    const startDate = user.createdAt > thirtyDaysAgo ? 
-      new Date(user.createdAt) : thirtyDaysAgo;
-    
-    // Helper function for consistent date string conversion
-    const getDateString = (date) => {
-      const d = new Date(date);
-      return d.toISOString().split('T')[0]; // YYYY-MM-DD format
-    };
-
-    // Fetch all data in parallel for better performance
-    const [meals, workouts, weights, allGoals] = await Promise.all([
-      // Get all meals in date range
-      Meal.find({
-        userId: req.user._id,
-        date: { $gte: startDate, $lte: endDate }
-      }).sort('date'),
-
-      // Get all workouts in date range
-      Workout.find({
-        userId: req.user._id,
-        date: { $gte: startDate, $lte: endDate }
-      }).sort('date'),
-
-      // Get all weight entries in date range
-      Weight.find({
-        userId: req.user._id,
-        date: { $gte: startDate, $lte: endDate }
-      }).sort('date'),
-
-      // Get the goals that were active during this period
-      Goals.find({
-        userId: req.user._id,
-        createdAt: { $lte: endDate }
-      }).sort('createdAt')
-    ]);
-
-    // Log weight entries to debug
-    console.log('Weight entries:', weights.map(w => ({ 
-      date: w.date, 
-      dateStr: getDateString(w.date), 
-      weight: w.weight 
-    })));
-
-    // Create a map of dates with actual data
-    const dateMap = new Map();
-    
-    // Process all meal dates
-    meals.forEach(meal => {
-      const dateStr = getDateString(meal.date);
-      if (!dateMap.has(dateStr)) {
-        dateMap.set(dateStr, { 
-          date: dateStr,
-          nutrition: { protein: 0, calories: 0, proteinGoal: 0, calorieGoal: 0 },
-          workouts: [],
-          hasData: true
-        });
-      }
-    });
-    
-    // Process all workout dates
-    workouts.forEach(workout => {
-      const dateStr = getDateString(workout.date);
-      if (!dateMap.has(dateStr)) {
-        dateMap.set(dateStr, { 
-          date: dateStr,
-          nutrition: { protein: 0, calories: 0, proteinGoal: 0, calorieGoal: 0 },
-          workouts: [],
-          hasData: true
-        });
-      }
-    });
-    
-    // Process all weight dates
-    weights.forEach(weight => {
-      const dateStr = getDateString(weight.date);
-      if (!dateMap.has(dateStr)) {
-        dateMap.set(dateStr, { 
-          date: dateStr,
-          nutrition: { protein: 0, calories: 0, proteinGoal: 0, calorieGoal: 0 },
-          workouts: [],
-          hasData: true
-        });
-      }
-      
-      const entry = dateMap.get(dateStr);
-      entry.weight = weight.weight;
-    });
-
-    // Only include dates that have actual data
-    const dailyStats = [];
-    
-    // Now process each date with data
-    for (const [dateStr, entry] of dateMap.entries()) {
-      const dateObj = new Date(dateStr + 'T00:00:00.000Z');
-      
-      // Find goals that apply to this date
-      let applicableGoals = null;
-      for (let i = allGoals.length - 1; i >= 0; i--) {
-        if (allGoals[i].createdAt <= dateObj) {
-          applicableGoals = allGoals[i];
-          break;
-        }
-      }
-      // Use the earliest goals if no applicable goals were found
-      if (!applicableGoals && allGoals.length > 0) {
-        applicableGoals = allGoals[0];
-      }
-
-      // Find meals for this day and calculate totals
-      const dayMeals = meals.filter(meal => getDateString(meal.date) === dateStr);
-      entry.nutrition.protein = dayMeals.reduce((sum, meal) => sum + meal.protein, 0);
-      entry.nutrition.calories = dayMeals.reduce((sum, meal) => sum + meal.calories, 0);
-      
-      // Add goal values if available
-      if (applicableGoals) {
-        entry.nutrition.proteinGoal = applicableGoals.proteinTarget;
-        entry.nutrition.calorieGoal = applicableGoals.calorieTarget;
-        entry.weightGoal = applicableGoals.targetWeight;
-      }
-
-      // Find workouts for this day
-      const dayWorkouts = workouts.filter(workout => getDateString(workout.date) === dateStr);
-      entry.workouts = dayWorkouts.map(w => ({
-        category: w.category,
-        exercises: w.exercises.map(e => ({
-          name: e.name,
-          sets: e.sets
-        }))
-      }));
-
-      // Add to the final result if there's actual data
-      if (entry.workouts.length > 0 || entry.nutrition.protein > 0 || entry.nutrition.calories > 0 || entry.weight) {
-        dailyStats.push(entry);
-      }
-    }
-
-    // Sort by date
-    dailyStats.sort((a, b) => a.date.localeCompare(b.date));
-    
-    res.json(dailyStats);
-  } catch (error) {
-    console.error('Error fetching history:', error);
-    res.status(500).json({ error: 'Failed to fetch history' });
-  }
-});
-
-// Get summary stats (for the header cards)
+// Get summary data for dashboard
 router.get('/summary', auth, async (req, res) => {
   try {
-    const initialGoals = await Goals.findOne({
-      userId: req.user._id
-    }).sort({ createdAt: 1 });
-
-    const currentGoals = await Goals.findOne({
-      userId: req.user._id
-    }).sort({ createdAt: -1 });
-
-    // Get latest weight entry
-    const latestWeight = await Weight.findOne({
-      userId: req.user._id
-    }).sort({ date: -1 });
-
+    // Starting point data
+    const firstGoal = await Goals.findOne({ userId: req.user._id })
+      .sort({ createdAt: 1 })
+      .limit(1);
+      
+    const firstWeight = await Weight.findOne({ userId: req.user._id })
+      .sort({ date: 1 })
+      .limit(1);
+    
+    // Current status data
+    const latestGoal = await Goals.findOne({ userId: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(1);
+      
+    const latestWeight = await Weight.findOne({ userId: req.user._id })
+      .sort({ date: -1 })
+      .limit(1);
+    
     // Get workout count for last 30 days
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 30);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     const workoutCount = await Workout.countDocuments({
       userId: req.user._id,
-      date: { $gte: startDate }
+      date: { $gte: thirtyDaysAgo }
     });
-
-    const lastUpdated = latestWeight ? new Date(latestWeight.date) : 
-                       (currentGoals ? new Date(currentGoals.updatedAt) : new Date());
     
-    // Convert to UTC ISO string to avoid timezone issues
-    const lastUpdatedISO = lastUpdated.toISOString();
-
-    res.json({
+    const summary = {
       startingPoint: {
-        weight: initialGoals?.currentWeight,
-        targetWeight: initialGoals?.targetWeight, 
-        weightGoal: initialGoals?.weightGoal,
-        muscleGoal: initialGoals?.muscleGoal,
-        startDate: initialGoals?.createdAt
+        weight: firstWeight?.weight,
+        weightGoal: firstGoal?.weightGoal,
+        muscleGoal: firstGoal?.muscleGoal,
+        startDate: firstGoal?.createdAt || firstWeight?.date
       },
       currentStatus: {
-        weight: latestWeight?.weight || currentGoals?.currentWeight,
-        targetWeight: currentGoals?.targetWeight,  
+        weight: latestWeight?.weight,
+        targetWeight: latestGoal?.targetWeight,
         workoutCount,
-        lastUpdated: lastUpdatedISO
+        lastUpdated: latestWeight?.date
       }
-    });
+    };
+    
+    res.json(summary);
   } catch (error) {
-    console.error('Error fetching summary:', error);
-    res.status(500).json({ error: 'Failed to fetch summary' });
+    res.status(500).json({ error: 'Failed to fetch summary data' });
+  }
+});
+
+// Get stats by day for the past 30 days
+router.get('/stats', auth, async (req, res) => {
+  try {
+    // Get user timezone
+    const user = await User.findById(req.user._id);
+    const timezone = user.timezone || 'UTC';
+    
+    // Get 30 days ago date
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    // Get all weights, meals, workouts
+    const [weights, meals, workouts, goals] = await Promise.all([
+      Weight.find({
+        userId: req.user._id,
+        date: { $gte: thirtyDaysAgo }
+      }).sort({ date: 1 }),
+      
+      Meal.find({
+        userId: req.user._id,
+        date: { $gte: thirtyDaysAgo },
+        isSaved: false
+      }).sort({ date: 1 }),
+      
+      Workout.find({
+        userId: req.user._id,
+        date: { $gte: thirtyDaysAgo }
+      }).sort({ date: 1 }),
+      
+      Goals.findOne({
+        userId: req.user._id
+      }).sort({ createdAt: -1 })
+    ]);
+    
+    // Get all unique dates across all data
+    const allDates = new Set();
+    
+    // Function to get date string (YYYY-MM-DD) in user's timezone
+    const getDateString = (date) => {
+      const d = new Date(date);
+      const localDate = new Date(d.toLocaleString('en-US', { timeZone: timezone }));
+      return localDate.toISOString().split('T')[0];
+    };
+    
+    // Collect all dates
+    weights.forEach(w => allDates.add(getDateString(w.date)));
+    meals.forEach(m => allDates.add(getDateString(m.date)));
+    workouts.forEach(w => allDates.add(getDateString(w.date)));
+    
+    // Sort dates
+    const sortedDates = Array.from(allDates).sort();
+    
+    // Create stats for each day
+    const stats = sortedDates.map(dateStr => {
+      // Get date range for this day in user's timezone
+      const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateStr, timezone);
+      
+      // Get weight for this day (if any)
+      const dayWeight = weights.find(w => 
+        getDateString(w.date) === dateStr
+      );
+      
+      // Get meals for this day
+      const dayMeals = meals.filter(m => 
+        m.date >= startOfDayUTC && m.date <= endOfDayUTC
+      );
+      
+      // Calculate nutrition totals
+      const protein = dayMeals.reduce((total, meal) => total + meal.protein, 0);
+      const calories = dayMeals.reduce((total, meal) => total + meal.calories, 0);
+      
+      // Get workouts for this day
+      const dayWorkouts = workouts.filter(w => 
+        w.date >= startOfDayUTC && w.date <= endOfDayUTC
+      );
+      
+      return {
+        date: dateStr,
+        weight: dayWeight ? dayWeight.weight : null,
+        nutrition: {
+          protein,
+          calories,
+          proteinGoal: goals?.proteinTarget || 150,
+          calorieGoal: goals?.calorieTarget || 2000
+        },
+        workouts: dayWorkouts.map(workout => ({
+          category: workout.category,
+          exercises: workout.exercises
+        }))
+      };
+    });
+    
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching history stats:', error);
+    res.status(500).json({ error: 'Failed to fetch history stats' });
+  }
+});
+
+// Get detailed data for a specific day
+router.get('/day/:date', auth, async (req, res) => {
+  try {
+    const dateParam = req.params.date; // Expected format: YYYY-MM-DD
+    
+    // Get user with timezone info
+    const user = await User.findById(req.user._id);
+    const timezone = user.timezone || 'UTC';
+    
+    // Get date range for the requested day
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateParam, timezone);
+    
+    // Get meals, weight, and workouts for this day
+    const [meals, weight, workouts, goals] = await Promise.all([
+      Meal.find({
+        userId: req.user._id,
+        date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
+        isSaved: false
+      }).sort('date'),
+      
+      Weight.findOne({
+        userId: req.user._id,
+        date: { $gte: startOfDayUTC, $lte: endOfDayUTC }
+      }),
+      
+      Workout.find({
+        userId: req.user._id,
+        date: { $gte: startOfDayUTC, $lte: endOfDayUTC }
+      }).sort('date'),
+      
+      Goals.findOne({
+        userId: req.user._id
+      }).sort({ createdAt: -1 })
+    ]);
+    
+    // Calculate nutrition totals
+    const protein = meals.reduce((total, meal) => total + meal.protein, 0);
+    const calories = meals.reduce((total, meal) => total + meal.calories, 0);
+    
+    const dayData = {
+      date: dateParam,
+      weight: weight ? weight.weight : null,
+      meals,
+      nutrition: {
+        protein,
+        calories,
+        proteinGoal: goals?.proteinTarget || 150,
+        calorieGoal: goals?.calorieTarget || 2000
+      },
+      workouts: workouts.map(workout => ({
+        category: workout.category,
+        exercises: workout.exercises
+      }))
+    };
+    
+    res.json(dayData);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch day data' });
   }
 });
 
