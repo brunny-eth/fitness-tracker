@@ -10,16 +10,16 @@ import User from '../models/user.js';
 const router = express.Router();
 
 // Helper function to get date range in user's timezone
-const getDateRangeInTimezone = (timezone = 'UTC') => {
-  // Current date
-  const now = new Date();
+const getDateRangeInTimezone = (dateString = null, timezone = 'UTC') => {
+  // Parse the date from the input string (YYYY-MM-DD) or use current date
+  const date = dateString ? new Date(dateString + 'T00:00:00.000Z') : new Date();
   
   // Create date with time set to 00:00:00 in user's timezone
-  const startOfDay = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const startOfDay = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
   startOfDay.setHours(0, 0, 0, 0);
   
   // Create date with time set to 23:59:59 in user's timezone
-  const endOfDay = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const endOfDay = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
   endOfDay.setHours(23, 59, 59, 999);
   
   // Convert back to UTC for database queries
@@ -59,7 +59,7 @@ router.get('/log', auth, async (req, res) => {
     const timezone = user.timezone || 'UTC';
     
     // Get date range in user's timezone
-    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(timezone);
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(null, timezone);
 
     const meals = await Meal.find({
       userId: req.user._id,
@@ -158,7 +158,7 @@ router.get('/stats', auth, async (req, res) => {
     const timezone = user.timezone || 'UTC';
     
     // Get date range in user's timezone
-    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(timezone);
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(null, timezone);
 
     const meals = await Meal.find({
       userId: req.user._id,
@@ -246,7 +246,6 @@ router.get('/log/date/:date', auth, async (req, res) => {
     }
     
     // Create date range for the requested day in user's timezone
-    // Uses helper function to account for timezone differences
     const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateParam, timezone);
 
     console.log('Fetching meals between:', startOfDayUTC, 'and', endOfDayUTC);
