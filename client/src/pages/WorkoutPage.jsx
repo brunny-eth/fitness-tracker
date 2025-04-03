@@ -211,12 +211,24 @@ const WorkoutCategories = ({ onSelectCategory }) => {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (retryCount = 0) => {
     try {
       setLoading(true);
       setError(null);
       
-      const data = await api.get('/api/categories');
+      let data;
+      try {
+        data = await api.get('/api/categories');
+      } catch (apiError) {
+        // If it's a timeout (504) and we haven't retried too many times, retry
+        if (apiError.status === 504 && retryCount < 3) {
+          console.log(`Retrying categories fetch (attempt ${retryCount + 1})`);
+          // Wait for 1 second before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return fetchCategories(retryCount + 1);
+        }
+        throw apiError;
+      }
       
       // Make sure we have an array of categories
       const categoryArray = Array.isArray(data) ? data : [];
@@ -245,7 +257,8 @@ const WorkoutCategories = ({ onSelectCategory }) => {
       setCategories(categoriesWithCounts);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
-      setError('Failed to load categories: ' + (error.message || 'Unknown error'));
+      setError('Failed to load categories. ' + 
+        (error.status === 504 ? 'Request timed out. Please try again.' : error.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }

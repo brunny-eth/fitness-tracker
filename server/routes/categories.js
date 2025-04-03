@@ -5,28 +5,64 @@ import ExerciseTemplate from '../models/exercise.js';
 
 const router = express.Router();
 
+// Helper function to handle MongoDB timeouts
+const withTimeout = (promise, timeoutMs = 5000) => {
+  let timeoutHandle;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      reject(new Error('Operation timed out'));
+    }, timeoutMs);
+  });
+
+  return Promise.race([
+    promise,
+    timeoutPromise
+  ]).finally(() => {
+    clearTimeout(timeoutHandle);
+  });
+};
+
 router.get('/', auth, async (req, res) => {
   try {
-    const categories = await Category
-      .find({ userId: req.user._id })
-      .sort({ name: 1 });
+    // Get categories with a 5 second timeout
+    const categories = await withTimeout(
+      Category.find({ userId: req.user._id }).sort({ name: 1 }),
+      5000
+    );
     
+    // Get exercise counts with a 5 second timeout for each category
     const categoriesWithCounts = await Promise.all(categories.map(async (category) => {
-      const count = await ExerciseTemplate.countDocuments({
-        categoryId: category._id,
-        userId: req.user._id,
-        isActive: true
-      });
-      
-      const categoryObj = category.toObject();
-      categoryObj.exerciseCount = count;
-      return categoryObj;
+      try {
+        const count = await withTimeout(
+          ExerciseTemplate.countDocuments({
+            categoryId: category._id,
+            userId: req.user._id,
+            isActive: true
+          }),
+          5000
+        );
+        
+        const categoryObj = category.toObject();
+        categoryObj.exerciseCount = count;
+        return categoryObj;
+      } catch (countError) {
+        console.error(`Error getting count for category ${category._id}:`, countError);
+        // Return category with count 0 if count query fails
+        const categoryObj = category.toObject();
+        categoryObj.exerciseCount = 0;
+        return categoryObj;
+      }
     }));
     
     res.json(categoriesWithCounts);
   } catch (error) {
     console.error('Category fetch error:', error); 
-    res.status(500).json({ message: 'Error fetching categories' });
+    // Send a more detailed error message
+    res.status(error.message === 'Operation timed out' ? 504 : 500)
+       .json({ 
+         message: 'Error fetching categories',
+         details: error.message
+       });
   }
 });
 
