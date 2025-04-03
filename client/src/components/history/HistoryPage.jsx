@@ -277,49 +277,11 @@ const handleSave = async () => {
   try {
     setIsSaving(true);
     
-    // Step 1: Get all today's entries to find out what's already logged
-    const todayEntries = await api.get('/api/nutrition/log');
-    console.log('All today entries:', todayEntries);
-    
-    // Step 2: Calculate totals from entries that aren't manual
-    const nonManualEntries = todayEntries.filter(meal => 
-      meal.name !== "Manual Entry" && meal.name !== "Manual Adjustment"
-    );
-    
-    const manualEntries = todayEntries.filter(meal => 
-      meal.name === "Manual Entry" || meal.name === "Manual Adjustment"
-    );
-    
-    // Step 3: Delete all manual entries
-    for (const meal of manualEntries) {
-      await api.delete(`/api/nutrition/log/${meal._id}`);
-    }
-    
-    // Step 4: Calculate non-manual totals
-    const nonManualTotals = nonManualEntries.reduce(
-      (acc, meal) => ({
-        protein: acc.protein + meal.protein,
-        calories: acc.calories + meal.calories
-      }),
-      { protein: 0, calories: 0 }
-    );
-    
-    // Step 5: Calculate the DIFFERENCE needed to reach edited values
-    const proteinNeeded = editedProtein - nonManualTotals.protein;
-    const caloriesNeeded = editedCalories - nonManualTotals.calories;
-    
-    console.log(`Non-manual totals: protein=${nonManualTotals.protein}g, calories=${nonManualTotals.calories}`);
-    console.log(`Needed adjustment: protein=${proteinNeeded}g, calories=${caloriesNeeded}`);
-    
-    // Step 6: Add a manual entry with just the DIFFERENCE
-    if (proteinNeeded !== 0 || caloriesNeeded !== 0) {
-      await api.post('/api/nutrition/log', {
-        name: "Manual Adjustment",
-        protein: proteinNeeded,
-        calories: caloriesNeeded,
-        date: new Date(entry.date)
-      });
-    }
+    // Use the new edit-date endpoint to handle the update
+    await api.post(`/api/nutrition/edit-date/${entry.date}`, {
+      protein: editedProtein,
+      calories: editedCalories
+    });
     
     // Call the parent component's update function with the new values
     onUpdate(entry.date, {
@@ -329,7 +291,7 @@ const handleSave = async () => {
     
     setIsEditing(false);
   } catch (error) {
-    console.error('Error saving nutrition data:', error);
+    console.error('Error saving changes:', error);
     alert('Failed to save changes. Please try again.');
   } finally {
     setIsSaving(false);

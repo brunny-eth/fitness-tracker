@@ -230,8 +230,6 @@ router.get('/weight/history', auth, async (req, res) => {
   }
 });
 
-// Add to server/routes/nutrition.js
-
 // Get meals for a specific date
 router.get('/log/date/:date', auth, async (req, res) => {
   try {
@@ -295,6 +293,51 @@ router.put('/log/:id', auth, async (req, res) => {
     res.json(updatedMeal);
   } catch (error) {
     res.status(400).json({ error: 'Failed to update meal' });
+  }
+});
+
+// Edit nutrition for a specific date
+router.post('/edit-date/:date', auth, async (req, res) => {
+  try {
+    const dateParam = req.params.date; // Expected format: YYYY-MM-DD
+    const { protein, calories } = req.body;
+    
+    // Get user with timezone info
+    const user = await User.findById(req.user._id);
+    const timezone = user?.timezone || 'UTC';
+    
+    // Validate the date format
+    const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(dateParam);
+    if (!isValidDate) {
+      return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+    }
+    
+    // Create date range for the requested day in user's timezone
+    const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateParam, timezone);
+
+    // Step 1: Delete all meals for this date
+    await Meal.deleteMany({
+      userId: req.user._id,
+      date: { $gte: startOfDayUTC, $lte: endOfDayUTC },
+      isSaved: false
+    });
+
+    // Step 2: Create a single manual entry with the totals
+    const manualEntry = new Meal({
+      userId: req.user._id,
+      name: "Manual Entry",
+      protein: protein,
+      calories: calories,
+      date: startOfDayUTC, // Use start of day for consistency
+      isSaved: false
+    });
+
+    await manualEntry.save();
+
+    res.json(manualEntry);
+  } catch (error) {
+    console.error('Error editing nutrition for date:', error);
+    res.status(500).json({ error: 'Failed to edit nutrition for date' });
   }
 });
 
