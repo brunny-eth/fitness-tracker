@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import WeightInput from '../ui/weight-input';
 
 const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieGoal }) => {
   const proteinProgress = (currentProtein / proteinGoal) * 100;
@@ -49,10 +50,11 @@ const NutritionStats = ({ currentProtein, proteinGoal, currentCalories, calorieG
   );
 };
 
-const WeightInput = ({ onSave }) => {
-  const [weight, setWeight] = useState('');
+const DailyWeightInput = ({ onSave }) => {
   const [todayWeight, setTodayWeight] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [tempWeight, setTempWeight] = useState('');
+  const [displayUnit, setDisplayUnit] = useState('lb');
   const { user } = useAuth();
 
   useEffect(() => {
@@ -65,7 +67,7 @@ const WeightInput = ({ onSave }) => {
         const weights = await api.get('/api/nutrition/weight/history');
         
         if (weights && weights.length > 0) {
-          const mostRecent = weights[0]; // Already sorted by date desc
+          const mostRecent = weights[0];
           
           // Check if the most recent entry is from today
           const today = new Date().toISOString().split('T')[0];
@@ -85,17 +87,22 @@ const WeightInput = ({ onSave }) => {
     checkTodayWeight();
   }, [user]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (weight) {
-      onSave(parseFloat(weight));
-      // Update the UI immediately after saving
+  const handleSave = () => {
+    if (tempWeight) {
+      onSave(tempWeight);
       setTodayWeight({ 
-        weight: parseFloat(weight), 
-        date: new Date() 
+        weight: tempWeight,
+        date: new Date(),
+        displayUnit: displayUnit
       });
-      setWeight('');
     }
+  };
+
+  const formatWeight = (weight, unit) => {
+    if (unit === 'lb') {
+      return `${(weight * 2.20462).toFixed(1)} lb`;
+    }
+    return `${weight.toFixed(1)} kg`;
   };
 
   if (isLoading) {
@@ -107,32 +114,36 @@ const WeightInput = ({ onSave }) => {
       {todayWeight ? (
         <div>
           <h3 className="font-medium mb-2">Today's Weight</h3>
-          <div className="text-lg font-semibold">{todayWeight.weight.toFixed(1)} kg</div>
+          <div className="text-lg font-semibold">
+            {formatWeight(todayWeight.weight, todayWeight.displayUnit || displayUnit)}
+          </div>
           <p className="text-sm text-gray-500 mt-2">
             You've already logged your weight today.
           </p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex gap-4 items-center">
-          <div className="flex-1">
-            <Label htmlFor="weight">Today's Weight (kg)</Label>
-            <Input
-              type="number"
-              id="weight"
-              step="0.1"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="Enter weight"
-            />
-          </div>
-          <Button type="submit" className="mt-6">
-            Save
+        <div className="space-y-4">
+          <WeightInput
+            label="Today's Weight"
+            onChange={(value) => {
+              setTempWeight(value);
+            }}
+            onUnitChange={(unit) => {
+              setDisplayUnit(unit);
+            }}
+          />
+          <Button 
+            onClick={handleSave}
+            disabled={!tempWeight}
+            className="w-full"
+          >
+            Save Weight
           </Button>
-        </form>
+          <p className="text-sm text-gray-500">
+            Tip: Weigh yourself at the same time each day for consistency
+          </p>
+        </div>
       )}
-      <p className="text-sm text-gray-500 mt-2">
-        Tip: Weigh yourself at the same time each day for consistency
-      </p>
     </Card>
   );
 };
@@ -404,7 +415,7 @@ const NutritionPage = () => {
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Nutrition Tracking</h1>
       <NutritionStats {...stats} />
-      <WeightInput onSave={async (weight) => {
+      <DailyWeightInput onSave={async (weight) => {
         if (!user) return;
         try {
           await api.post('/api/nutrition/weight', { weight });

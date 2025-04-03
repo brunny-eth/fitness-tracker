@@ -6,9 +6,11 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { ArrowRight, Save, Undo } from 'lucide-react';
+import WeightInput from '../ui/weight-input';
 
 const GoalsPage = () => {
   const { user } = useAuth();
+  const [weightUnit, setWeightUnit] = useState('lb');
   const [goals, setGoals] = useState({
     weightGoal: 'maintain',
     muscleGoal: 'maintain',
@@ -157,6 +159,23 @@ const GoalsPage = () => {
     }
   };
 
+  const getWeeklyGoalOptions = (unit) => {
+    if (unit === 'lb') {
+      return [
+        { value: 0.25 * 2.20462, label: '0.5 lb per week' },
+        { value: 0.5 * 2.20462, label: '1 lb per week' },
+        { value: 0.75 * 2.20462, label: '1.5 lb per week' },
+        { value: 1 * 2.20462, label: '2 lb per week' }
+      ];
+    }
+    return [
+      { value: 0.25, label: '0.25 kg per week' },
+      { value: 0.5, label: '0.5 kg per week' },
+      { value: 0.75, label: '0.75 kg per week' },
+      { value: 1, label: '1 kg per week' }
+    ];
+  };
+
   if (loading && !isNewUser) {
     return <div className="max-w-2xl mx-auto p-4">Loading your fitness goals...</div>;
   }
@@ -201,45 +220,41 @@ const GoalsPage = () => {
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="currentWeight">Current Weight (kg)</Label>
-                <Input
-                  id="currentWeight"
-                  type="number"
+                <WeightInput
+                  label="Current Weight"
                   value={goals.currentWeight}
-                  onChange={(e) => {
+                  onChange={(value) => {
                     const newGoals = {
                       ...goals,
-                      currentWeight: parseFloat(e.target.value)
+                      currentWeight: value
                     };
                     setGoals(newGoals);
                     updateCalculations(newGoals);
                   }}
                   required
-                  step="0.1"
+                  onUnitChange={(unit) => setWeightUnit(unit)}
                 />
               </div>
 
               <div>
-                <Label htmlFor="targetWeight">Target Weight (kg)</Label>
-                <Input
-                  id="targetWeight"
-                  type="number"
+                <WeightInput
+                  label="Target Weight"
                   value={goals.targetWeight}
-                  onChange={(e) => {
+                  onChange={(value) => {
                     const newGoals = {
                       ...goals,
-                      targetWeight: parseFloat(e.target.value)
+                      targetWeight: value
                     };
                     setGoals(newGoals);
                     updateCalculations(newGoals);
                   }}
                   required
-                  step="0.1"
+                  defaultUnit={weightUnit}
                 />
               </div>
 
               <div>
-                <Label htmlFor="weeklyGoal">Weekly Goal (kg)</Label>
+                <Label htmlFor="weeklyGoal">Weekly Goal ({weightUnit})</Label>
                 <select
                   id="weeklyGoal"
                   value={goals.weeklyGoal}
@@ -253,10 +268,11 @@ const GoalsPage = () => {
                   }}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="0.25">0.25 kg per week</option>
-                  <option value="0.5">0.5 kg per week</option>
-                  <option value="0.75">0.75 kg per week</option>
-                  <option value="1">1 kg per week</option>
+                  {getWeeklyGoalOptions(weightUnit).map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
