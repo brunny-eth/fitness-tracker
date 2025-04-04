@@ -50,13 +50,13 @@ export const TimeZoneSelector = () => {
         className="w-full p-2 border rounded"
         disabled={saving}
       >
-        <option value="UTC">UTC (Coordinated Universal Time)</option>
         <option value="America/New_York">Eastern Time (US & Canada)</option>
         <option value="America/Chicago">Central Time (US & Canada)</option>
         <option value="America/Denver">Mountain Time (US & Canada)</option>
         <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
         <option value="America/Anchorage">Alaska (US)</option>
         <option value="Pacific/Honolulu">Hawaii (US)</option>
+        <option value="UTC">UTC (Coordinated Universal Time)</option>
         <option value="Europe/London">London, Edinburgh</option>
         <option value="Europe/Paris">Paris, Berlin, Rome, Madrid</option>
         <option value="Asia/Tokyo">Tokyo, Seoul</option>

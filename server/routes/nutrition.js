@@ -10,7 +10,7 @@ import User from '../models/user.js';
 const router = express.Router();
 
 // Helper function to get date range in user's timezone
-const getDateRangeInTimezone = (dateString = null, timezone = 'UTC') => {
+const getDateRangeInTimezone = (dateString = null, timezone = 'America/New_York') => {
   // Parse the date from the input string (YYYY-MM-DD) or use current date
   const date = dateString ? new Date(dateString + 'T00:00:00.000Z') : new Date();
   

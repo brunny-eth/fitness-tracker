@@ -16,7 +16,7 @@ export const getUserTimezone = (user) => {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   } catch (error) {
     console.error('Error getting browser timezone:', error);
-    return 'UTC'; // Default fallback
+    return 'America/New_York'; // Default fallback
   }
 };
 

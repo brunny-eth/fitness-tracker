@@ -277,7 +277,8 @@ const handleSave = async () => {
   try {
     setIsSaving(true);
     
-    // Use the new edit-date endpoint to handle the update
+    // The entry.date is already in YYYY-MM-DD format and represents the correct date
+    // in the user's timezone, so we use it directly
     await api.post(`/api/nutrition/edit-date/${entry.date}`, {
       protein: editedProtein,
       calories: editedCalories
