@@ -60,7 +60,7 @@ const ProgressChart = ({ data, targetWeight }) => {
     weight: '#8884d8',    // Purple
     protein: '#22c55e',   // Green
     calories: '#f59e0b',  // Amber/Yellow
-    targetWeight: '#9ca3af'  // Gray for target line
+    targetWeight: '#ef4444'  // Red for target weight line
   };
 
   // Format date for chart display
@@ -138,6 +138,12 @@ const ProgressChart = ({ data, targetWeight }) => {
     };
   });
 
+  // Calculate weight domain to ensure goal line is visible
+  const weights = data.map(d => d.weight).filter(w => w != null);
+  const minWeight = Math.min(...weights, targetWeight);
+  const maxWeight = Math.max(...weights, targetWeight);
+  const weightPadding = (maxWeight - minWeight) * 0.1;
+
   return (
     <Card className="p-4 mb-6">
       <h3 className="text-lg font-semibold mb-4">Progress Tracking</h3>
@@ -164,7 +170,7 @@ const ProgressChart = ({ data, targetWeight }) => {
             <YAxis 
               yAxisId="weight" 
               orientation="right"
-              domain={['dataMin - 1', 'dataMax + 1']}
+              domain={[minWeight - weightPadding, maxWeight + weightPadding]}
               tickFormatter={formatWeight}
               tick={{ fontSize: 12 }}
               width={35}
@@ -193,6 +199,12 @@ const ProgressChart = ({ data, targetWeight }) => {
                 y={targetWeight}
                 stroke={colors.targetWeight}
                 strokeDasharray="3 3"
+                label={{
+                  value: `Weight Goal: ${targetWeight}kg`,
+                  position: 'right',
+                  fill: colors.targetWeight,
+                  fontSize: 12
+                }}
               />
             )}
             
