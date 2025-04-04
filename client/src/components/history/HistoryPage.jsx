@@ -70,6 +70,12 @@ const ProgressChart = ({ data, targetWeight }) => {
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
   
+  // Format weight for display (1 decimal place)
+  const formatWeight = (value) => {
+    if (value == null) return '';
+    return Number(value).toFixed(1);
+  };
+  
   // Create custom tooltip to ensure percentages have % signs
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload || !payload.length) return null;
@@ -84,15 +90,15 @@ const ProgressChart = ({ data, targetWeight }) => {
           // Format based on the data type
           switch(entry.dataKey) {
             case 'weight':
-              valueDisplay = `${entry.value.toFixed(1)} kg`;
+              valueDisplay = `${Number(entry.value).toFixed(1)} kg`;
               name = 'Weight';
               break;
             case 'nutrition.proteinPercentage':
-              valueDisplay = `${entry.value}% of daily goal`;
+              valueDisplay = `${Math.round(entry.value)}% of daily goal`;
               name = 'Protein';
               break;
             case 'nutrition.caloriesPercentage':
-              valueDisplay = `${entry.value}% of daily goal`;
+              valueDisplay = `${Math.round(entry.value)}% of daily goal`;
               name = 'Calories';
               break;
             default:
@@ -132,8 +138,6 @@ const ProgressChart = ({ data, targetWeight }) => {
     };
   });
 
-  // Target weight is now passed as a prop
-
   return (
     <Card className="p-4 mb-6">
       <h3 className="text-lg font-semibold mb-4">Progress Tracking</h3>
@@ -141,38 +145,37 @@ const ProgressChart = ({ data, targetWeight }) => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
             data={transformedData} 
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            margin={{ top: 20, right: 60, left: 20, bottom: 20 }}
           >
             <XAxis 
               dataKey="date" 
               tickFormatter={formatDate}
               tick={{ fontSize: 12 }}
+              interval="preserveStartEnd"
             />
             <YAxis 
               yAxisId="percentage" 
               orientation="left"
               domain={[0, 200]}
-              label={{ 
-                value: 'Goal Percentage (%)', 
-                angle: -90, 
-                position: 'left',
-                offset: 0
-              }}
-              ticks={[0, 50, 100, 150, 200]}
+              tickFormatter={(value) => `${value}%`}
+              tick={{ fontSize: 12 }}
+              width={45}
             />
             <YAxis 
               yAxisId="weight" 
-              orientation="right" 
-              domain={['dataMin - 2', 'dataMax + 2']}
-              label={{ 
-                value: 'Weight (kg)', 
-                angle: 90, 
-                position: 'right',
-                offset: 0
-              }}
+              orientation="right"
+              domain={['dataMin - 1', 'dataMax + 1']}
+              tickFormatter={formatWeight}
+              tick={{ fontSize: 12 }}
+              width={35}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend verticalAlign="top" height={36} />
+            <Legend 
+              verticalAlign="top" 
+              height={36}
+              iconType="circle"
+              iconSize={8}
+            />
             
             {/* Reference line for 100% goal */}
             <ReferenceLine 
@@ -180,12 +183,7 @@ const ProgressChart = ({ data, targetWeight }) => {
               y={100}
               stroke="#e5e7eb"
               strokeWidth={1}
-              label={{
-                value: "100%",
-                position: "left",
-                fill: "#9ca3af",
-                fontSize: 11
-              }}
+              strokeDasharray="3 3"
             />
             
             {/* Target weight reference line (if available) */}
@@ -193,12 +191,6 @@ const ProgressChart = ({ data, targetWeight }) => {
               <ReferenceLine
                 yAxisId="weight"
                 y={targetWeight}
-                label={{
-                  value: `Target: ${targetWeight}kg`,
-                  position: 'insideTopRight',
-                  fill: colors.targetWeight,
-                  fontSize: 12
-                }}
                 stroke={colors.targetWeight}
                 strokeDasharray="3 3"
               />
@@ -210,8 +202,8 @@ const ProgressChart = ({ data, targetWeight }) => {
               type="monotone" 
               dataKey="weight" 
               stroke={colors.weight}
-              strokeWidth={2.5}
-              dot={{ r: 3 }}
+              strokeWidth={2}
+              dot={{ r: 2 }}
               name="Weight"
               connectNulls={true}
             />
@@ -223,7 +215,7 @@ const ProgressChart = ({ data, targetWeight }) => {
               dataKey="nutrition.proteinPercentage" 
               stroke={colors.protein}
               strokeWidth={2}
-              dot={{ r: 3 }}
+              dot={{ r: 2 }}
               name="Protein"
               connectNulls={true}
             />
@@ -235,14 +227,14 @@ const ProgressChart = ({ data, targetWeight }) => {
               dataKey="nutrition.caloriesPercentage" 
               stroke={colors.calories}
               strokeWidth={2}
-              dot={{ r: 3 }}
+              dot={{ r: 2 }}
               name="Calories"
               connectNulls={true}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <div className="text-center mt-2 text-s text-gray-500 italic">
+      <div className="text-center mt-2 text-sm text-gray-500 italic">
         Don't forget: protein should be above 100%; calories should be below 100%.
       </div>
     </Card>
