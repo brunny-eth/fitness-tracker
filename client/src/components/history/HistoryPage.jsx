@@ -166,6 +166,17 @@ const ProgressChart = ({ data, targetWeight }) => {
               tickFormatter={(value) => `${value}%`}
               tick={{ fontSize: 12 }}
               width={45}
+              label={{
+                value: "Daily Goals (%)",
+                angle: -90,
+                position: 'insideLeft',
+                style: {
+                  fontSize: 12,
+                  fill: '#6b7280',
+                  textAnchor: 'middle'
+                },
+                offset: 0
+              }}
             />
             <YAxis 
               yAxisId="weight" 
