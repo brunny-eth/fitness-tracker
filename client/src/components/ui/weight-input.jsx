@@ -12,7 +12,12 @@ const WeightInput = ({
   onUnitChange = null
 }) => {
   const [unit, setUnit] = useState(defaultUnit);
-  const [displayValue, setDisplayValue] = useState(value ? (defaultUnit === 'lb' ? value * 2.20462 : value) : '');
+  const [displayValue, setDisplayValue] = useState(() => {
+    if (!value) return '';
+    return defaultUnit === 'lb' 
+      ? (value * 2.20462).toFixed(1) 
+      : value.toFixed(1);
+  });
 
   const handleUnitChange = (newUnit) => {
     setUnit(newUnit);
@@ -21,9 +26,9 @@ const WeightInput = ({
     }
     if (displayValue) {
       const kgValue = newUnit === 'kg' 
-        ? displayValue 
-        : displayValue * 0.453592;
-      onChange(kgValue);
+        ? parseFloat(displayValue) 
+        : parseFloat(displayValue) * 0.453592;
+      onChange(parseFloat(kgValue.toFixed(1)));
     }
   };
 
@@ -35,7 +40,7 @@ const WeightInput = ({
       const kgValue = unit === 'kg' 
         ? parseFloat(inputValue) 
         : parseFloat(inputValue) * 0.453592;
-      onChange(kgValue);
+      onChange(parseFloat(kgValue.toFixed(1)));
     } else {
       onChange('');
     }
@@ -80,7 +85,7 @@ const WeightInput = ({
       />
       {displayValue && unit === 'lb' && (
         <div className="text-sm text-gray-500">
-          {displayValue} lb = {(parseFloat(displayValue) * 0.453592).toFixed(1)} kg
+          {parseFloat(displayValue).toFixed(1)} lb = {(parseFloat(displayValue) * 0.453592).toFixed(1)} kg
         </div>
       )}
     </div>
