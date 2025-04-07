@@ -11,8 +11,14 @@ const router = express.Router();
 
 // Helper function to get date range in user's timezone
 const getDateRangeInTimezone = (dateString = null, timezone = 'America/New_York') => {
-  // Parse the date from the input string (YYYY-MM-DD) or use current date
-  const date = dateString ? new Date(dateString + 'T00:00:00.000Z') : new Date();
+  let date;
+  if (dateString) {
+    // If a date string is provided, parse it as UTC
+    date = new Date(dateString + 'T00:00:00.000Z');
+  } else {
+    // If no date string is provided, get the current date in the user's timezone
+    date = new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
+  }
   
   // Create date with time set to 00:00:00 in user's timezone
   const startOfDay = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
@@ -76,12 +82,21 @@ router.get('/log', auth, async (req, res) => {
 // Log a new meal
 router.post('/log', auth, async (req, res) => {
   try {
+    // Get user's timezone
+    const user = await User.findById(req.user._id);
+    const timezone = user.timezone || 'UTC';
+    
+    // Create a date in the user's timezone
+    const now = new Date();
+    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    
     const meal = new Meal({
       userId: req.user._id,
       name: req.body.name,
       protein: req.body.protein,
       calories: req.body.calories,
-      details: req.body.details
+      details: req.body.details,
+      date: tzDate
     });
 
     await meal.save();
@@ -120,12 +135,21 @@ router.get('/saved-meals', auth, async (req, res) => {
 // Save a meal for future use
 router.post('/save-meal', auth, async (req, res) => {
   try {
+    // Get user's timezone
+    const user = await User.findById(req.user._id);
+    const timezone = user.timezone || 'UTC';
+    
+    // Create a date in the user's timezone
+    const now = new Date();
+    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    
     const meal = new Meal({
       userId: req.user._id,
       name: req.body.name,
       protein: req.body.protein,
       calories: req.body.calories,
       details: req.body.details,
+      date: tzDate,
       isSaved: true
     });
 
