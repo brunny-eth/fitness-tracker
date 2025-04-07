@@ -86,9 +86,13 @@ router.post('/log', auth, async (req, res) => {
     const user = await User.findById(req.user._id);
     const timezone = user.timezone || 'UTC';
     
-    // Create a date in the user's timezone
+    // Get current time in UTC
     const now = new Date();
-    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    
+    // Convert UTC to user's timezone while preserving the actual time
+    const userTzOffset = now.toLocaleString('en-US', { timeZone: timezone, timeZoneName: 'short' }).split(' ')[2];
+    const offsetHours = parseInt(userTzOffset.slice(3)) * (userTzOffset[0] === '-' ? -1 : 1);
+    const tzDate = new Date(now.getTime() + offsetHours * 60 * 60 * 1000);
     
     const meal = new Meal({
       userId: req.user._id,
@@ -102,6 +106,7 @@ router.post('/log', auth, async (req, res) => {
     await meal.save();
     res.status(201).json(meal);
   } catch (error) {
+    console.error('Error logging meal:', error);
     res.status(400).json({ error: 'Failed to log meal' });
   }
 });
@@ -139,9 +144,13 @@ router.post('/save-meal', auth, async (req, res) => {
     const user = await User.findById(req.user._id);
     const timezone = user.timezone || 'UTC';
     
-    // Create a date in the user's timezone
+    // Get current time in UTC
     const now = new Date();
-    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    
+    // Convert UTC to user's timezone while preserving the actual time
+    const userTzOffset = now.toLocaleString('en-US', { timeZone: timezone, timeZoneName: 'short' }).split(' ')[2];
+    const offsetHours = parseInt(userTzOffset.slice(3)) * (userTzOffset[0] === '-' ? -1 : 1);
+    const tzDate = new Date(now.getTime() + offsetHours * 60 * 60 * 1000);
     
     const meal = new Meal({
       userId: req.user._id,
@@ -156,6 +165,7 @@ router.post('/save-meal', auth, async (req, res) => {
     await meal.save();
     res.status(201).json(meal);
   } catch (error) {
+    console.error('Error saving meal:', error);
     res.status(400).json({ error: 'Failed to save meal' });
   }
 });
