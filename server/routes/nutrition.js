@@ -86,13 +86,13 @@ router.post('/log', auth, async (req, res) => {
     const user = await User.findById(req.user._id);
     const timezone = user.timezone || 'UTC';
     
-    // Get current time in UTC
+    // Create a date string in the user's timezone
     const now = new Date();
+    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
     
-    // Convert UTC to user's timezone while preserving the actual time
-    const userTzOffset = now.toLocaleString('en-US', { timeZone: timezone, timeZoneName: 'short' }).split(' ')[2];
-    const offsetHours = parseInt(userTzOffset.slice(3)) * (userTzOffset[0] === '-' ? -1 : 1);
-    const tzDate = new Date(now.getTime() + offsetHours * 60 * 60 * 1000);
+    // Adjust for timezone offset to get correct UTC time
+    const offset = tzDate.getTime() - now.getTime();
+    const correctedDate = new Date(now.getTime() - offset);
     
     const meal = new Meal({
       userId: req.user._id,
@@ -100,7 +100,7 @@ router.post('/log', auth, async (req, res) => {
       protein: req.body.protein,
       calories: req.body.calories,
       details: req.body.details,
-      date: tzDate
+      date: correctedDate
     });
 
     await meal.save();
@@ -144,13 +144,13 @@ router.post('/save-meal', auth, async (req, res) => {
     const user = await User.findById(req.user._id);
     const timezone = user.timezone || 'UTC';
     
-    // Get current time in UTC
+    // Create a date string in the user's timezone
     const now = new Date();
+    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
     
-    // Convert UTC to user's timezone while preserving the actual time
-    const userTzOffset = now.toLocaleString('en-US', { timeZone: timezone, timeZoneName: 'short' }).split(' ')[2];
-    const offsetHours = parseInt(userTzOffset.slice(3)) * (userTzOffset[0] === '-' ? -1 : 1);
-    const tzDate = new Date(now.getTime() + offsetHours * 60 * 60 * 1000);
+    // Adjust for timezone offset to get correct UTC time
+    const offset = tzDate.getTime() - now.getTime();
+    const correctedDate = new Date(now.getTime() - offset);
     
     const meal = new Meal({
       userId: req.user._id,
@@ -158,7 +158,7 @@ router.post('/save-meal', auth, async (req, res) => {
       protein: req.body.protein,
       calories: req.body.calories,
       details: req.body.details,
-      date: tzDate,
+      date: correctedDate,
       isSaved: true
     });
 
