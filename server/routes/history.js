@@ -87,7 +87,7 @@ router.get('/stats', auth, async (req, res) => {
     const user = await User.findById(req.user._id);
     const timezone = user.timezone || 'UTC';
     
-    // Get 30 days ago date
+    // Get 30 days ago date in user's timezone
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
@@ -138,23 +138,26 @@ router.get('/stats', auth, async (req, res) => {
       const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateStr, timezone);
       
       // Get weight for this day (if any)
-      const dayWeight = weights.find(w => 
-        getDateString(w.date) === dateStr
-      );
+      const dayWeight = weights.find(w => {
+        const weightDate = getDateString(w.date);
+        return weightDate === dateStr;
+      });
       
       // Get meals for this day
-      const dayMeals = meals.filter(m => 
-        m.date >= startOfDayUTC && m.date <= endOfDayUTC
-      );
+      const dayMeals = meals.filter(m => {
+        const mealDate = getDateString(m.date);
+        return mealDate === dateStr;
+      });
       
       // Calculate nutrition totals
       const protein = dayMeals.reduce((total, meal) => total + meal.protein, 0);
       const calories = dayMeals.reduce((total, meal) => total + meal.calories, 0);
       
       // Get workouts for this day
-      const dayWorkouts = workouts.filter(w => 
-        w.date >= startOfDayUTC && w.date <= endOfDayUTC
-      );
+      const dayWorkouts = workouts.filter(w => {
+        const workoutDate = getDateString(w.date);
+        return workoutDate === dateStr;
+      });
       
       return {
         date: dateStr,
@@ -191,6 +194,13 @@ router.get('/day/:date', auth, async (req, res) => {
     // Get date range for the requested day
     const { startOfDayUTC, endOfDayUTC } = getDateRangeInTimezone(dateParam, timezone);
     
+    // Function to get date string (YYYY-MM-DD) in user's timezone
+    const getDateString = (date) => {
+      const d = new Date(date);
+      const localDate = new Date(d.toLocaleString('en-US', { timeZone: timezone }));
+      return localDate.toISOString().split('T')[0];
+    };
+    
     // Get meals, weight, and workouts for this day
     const [meals, weight, workouts, goals] = await Promise.all([
       Meal.find({
@@ -214,21 +224,26 @@ router.get('/day/:date', auth, async (req, res) => {
       }).sort({ createdAt: -1 })
     ]);
     
+    // Filter data to ensure it matches the exact date in user's timezone
+    const filteredMeals = meals.filter(m => getDateString(m.date) === dateParam);
+    const filteredWeight = weight && getDateString(weight.date) === dateParam ? weight : null;
+    const filteredWorkouts = workouts.filter(w => getDateString(w.date) === dateParam);
+    
     // Calculate nutrition totals
-    const protein = meals.reduce((total, meal) => total + meal.protein, 0);
-    const calories = meals.reduce((total, meal) => total + meal.calories, 0);
+    const protein = filteredMeals.reduce((total, meal) => total + meal.protein, 0);
+    const calories = filteredMeals.reduce((total, meal) => total + meal.calories, 0);
     
     const dayData = {
       date: dateParam,
-      weight: weight ? weight.weight : null,
-      meals,
+      weight: filteredWeight ? filteredWeight.weight : null,
+      meals: filteredMeals,
       nutrition: {
         protein,
         calories,
         proteinGoal: goals?.proteinTarget || 150,
         calorieGoal: goals?.calorieTarget || 2000
       },
-      workouts: workouts.map(workout => ({
+      workouts: filteredWorkouts.map(workout => ({
         category: workout.category,
         exercises: workout.exercises
       }))
