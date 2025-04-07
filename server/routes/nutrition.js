@@ -82,25 +82,13 @@ router.get('/log', auth, async (req, res) => {
 // Log a new meal
 router.post('/log', auth, async (req, res) => {
   try {
-    // Get user's timezone
-    const user = await User.findById(req.user._id);
-    const timezone = user.timezone || 'UTC';
-    
-    // Create a date string in the user's timezone
-    const now = new Date();
-    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-    
-    // Adjust for timezone offset to get correct UTC time
-    const offset = tzDate.getTime() - now.getTime();
-    const correctedDate = new Date(now.getTime() - offset);
-    
     const meal = new Meal({
       userId: req.user._id,
       name: req.body.name,
       protein: req.body.protein,
       calories: req.body.calories,
       details: req.body.details,
-      date: correctedDate
+      date: new Date()  // Just use the current time in UTC
     });
 
     await meal.save();
@@ -140,25 +128,13 @@ router.get('/saved-meals', auth, async (req, res) => {
 // Save a meal for future use
 router.post('/save-meal', auth, async (req, res) => {
   try {
-    // Get user's timezone
-    const user = await User.findById(req.user._id);
-    const timezone = user.timezone || 'UTC';
-    
-    // Create a date string in the user's timezone
-    const now = new Date();
-    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-    
-    // Adjust for timezone offset to get correct UTC time
-    const offset = tzDate.getTime() - now.getTime();
-    const correctedDate = new Date(now.getTime() - offset);
-    
     const meal = new Meal({
       userId: req.user._id,
       name: req.body.name,
       protein: req.body.protein,
       calories: req.body.calories,
       details: req.body.details,
-      date: correctedDate,
+      date: new Date(),  // Just use the current time in UTC
       isSaved: true
     });
 
